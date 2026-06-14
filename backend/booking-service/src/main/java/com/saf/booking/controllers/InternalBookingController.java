@@ -22,7 +22,7 @@ public class InternalBookingController {
         return ResponseEntity.ok(ApiResponse.success("OK", bookingService.getBookingInfo(id)));
     }
 
-    @PatchMapping("/{id}/status")
+    @PutMapping("/{id}/status")
     public ResponseEntity<ApiResponse<Void>> updateBookingStatus(
             @PathVariable Long id,
             @RequestParam String status) {

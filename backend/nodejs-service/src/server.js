@@ -81,7 +81,7 @@ setupSocketEvents(io);
 // Receives booking events from Spring Boot and pushes via Socket.io.
 // Retries automatically on connection failure (RabbitMQ may start after this service).
 const RABBITMQ_URI = process.env.RABBITMQ_URI || 'amqp://saf:saf123@rabbitmq:5672';
-const NOTIFICATION_QUEUE = 'saf.notification.queue';
+const SOCKET_QUEUE = 'saf.socket.queue';
 const BOOKING_EXCHANGE = 'saf.booking';
 
 async function connectRabbitMQ(io) {
@@ -94,15 +94,53 @@ async function connectRabbitMQ(io) {
       const channel = await connection.createChannel();
 
       await channel.assertExchange(BOOKING_EXCHANGE, 'topic', { durable: true });
-      await channel.assertQueue(NOTIFICATION_QUEUE, { durable: true });
-      await channel.bindQueue(NOTIFICATION_QUEUE, BOOKING_EXCHANGE, 'booking.#');
+      await channel.assertQueue(SOCKET_QUEUE, { durable: true });
+      await channel.bindQueue(SOCKET_QUEUE, BOOKING_EXCHANGE, 'booking.#');
       channel.prefetch(10);
 
-      channel.consume(NOTIFICATION_QUEUE, (msg) => {
+      channel.consume(SOCKET_QUEUE, (msg) => {
         if (!msg) return;
         try {
-          const { userId, notification } = JSON.parse(msg.content.toString());
-          io.to(`user_${String(userId)}`).emit('notification', notification);
+          const payload = JSON.parse(msg.content.toString());
+          const {
+            type,
+            studentId,
+            landlordId,
+            roomTitle = '',
+            studentName = 'Sinh viên',
+            landlordName = 'Chủ nhà',
+          } = payload;
+
+          const push = (userId, title, body) => {
+            if (userId) {
+              io.to(`user_${String(userId)}`).emit('notification', { type: type?.toLowerCase(), title, body });
+            }
+          };
+
+          switch (type) {
+            case 'NEW_BOOKING':
+              push(landlordId, 'Yêu cầu đặt lịch mới', `${studentName} vừa gửi yêu cầu xem phòng "${roomTitle}"`);
+              break;
+            case 'BOOKING_CONFIRMED':
+              push(studentId, 'Lịch hẹn được xác nhận', `Chủ trọ ${landlordName} đã xác nhận lịch xem phòng "${roomTitle}"`);
+              break;
+            case 'BOOKING_REJECTED':
+              push(studentId, 'Lịch hẹn bị từ chối', `Chủ trọ ${landlordName} đã từ chối yêu cầu xem phòng "${roomTitle}"`);
+              break;
+            case 'BOOKING_CANCELLED':
+              push(landlordId, 'Sinh viên hủy lịch hẹn', `${studentName} đã hủy yêu cầu xem phòng "${roomTitle}"`);
+              break;
+            case 'BOOKING_COMPLETED':
+              push(studentId, 'Xem phòng hoàn thành', `Bạn đã xem phòng "${roomTitle}". Hãy để lại đánh giá nhé!`);
+              break;
+            case 'PAYMENT_SUCCESS':
+              push(studentId, 'Thanh toán thành công', `Bạn đã đặt cọc thành công phòng "${roomTitle}"`);
+              push(landlordId, 'Phòng đã được thuê', `${studentName} đã hoàn tất thanh toán thuê phòng "${roomTitle}"`);
+              break;
+            default:
+              console.warn('[RabbitMQ] Unknown event type:', type);
+          }
+
           channel.ack(msg);
         } catch (err) {
           console.error('[RabbitMQ] Failed to process message:', err.message);
@@ -110,7 +148,7 @@ async function connectRabbitMQ(io) {
         }
       });
 
-      console.log('[RabbitMQ] Connected — consuming', NOTIFICATION_QUEUE);
+      console.log('[RabbitMQ] Connected — consuming', SOCKET_QUEUE);
 
       // Auto-reconnect when connection drops
       connection.on('close', () => {

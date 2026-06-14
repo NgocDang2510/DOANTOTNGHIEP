@@ -6,6 +6,8 @@ import com.saf.payment.security.AuthorizationUtil;
 import com.saf.payment.services.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,15 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final AuthorizationUtil authorizationUtil;
 
+    @PostMapping("/booking/{bookingId}")
+    public ResponseEntity<ApiResponse<Map<String, String>>> createPayment(
+            @PathVariable Long bookingId,
+            HttpServletRequest request) {
+        var user = authorizationUtil.getCurrentUser();
+        String url = paymentService.createVNPayUrl(bookingId, user, request.getRemoteAddr());
+        return ResponseEntity.ok(ApiResponse.success("URL thanh toán tạo thành công", Map.of("payUrl", url)));
+    }
+
     @PostMapping("/booking/{bookingId}/vnpay")
     public ResponseEntity<ApiResponse<String>> createVNPayUrl(
             @PathVariable Long bookingId,
@@ -29,10 +40,20 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay-return")
-    public ResponseEntity<ApiResponse<PaymentResponse>> vnpayReturn(
-            @RequestParam Map<String, String> params) {
+    public ResponseEntity<Void> vnpayReturn(@RequestParam Map<String, String> params) {
         PaymentResponse response = paymentService.handleVNPayReturn(params);
-        return ResponseEntity.ok(ApiResponse.success("Xử lý thanh toán thành công", response));
+        String responseCode = params.getOrDefault("vnp_ResponseCode", "99");
+        String redirectUrl;
+        if ("00".equals(responseCode) && response != null) {
+            redirectUrl = "http://localhost/payment-result?status=success"
+                    + "&amount=" + params.getOrDefault("vnp_Amount", "")
+                    + "&txnRef=" + response.getTxnRef();
+        } else {
+            redirectUrl = "http://localhost/payment-result?status=failed&code=" + responseCode;
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", redirectUrl);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @GetMapping("/booking/{bookingId}/status")

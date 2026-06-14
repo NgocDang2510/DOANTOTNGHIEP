@@ -3,6 +3,7 @@ package com.saf.notification.listeners;
 import com.saf.notification.clients.AuthServiceClient;
 import com.saf.notification.dtos.UserInfo;
 import com.saf.notification.services.EmailService;
+import com.saf.notification.services.NotificationStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -17,6 +18,7 @@ public class BookingNotificationListener {
 
     private final EmailService emailService;
     private final AuthServiceClient authServiceClient;
+    private final NotificationStorageService storageService;
 
     @RabbitListener(queues = "saf.notification.queue")
     public void handleBookingEvent(Map<String, Object> payload) {
@@ -35,7 +37,10 @@ public class BookingNotificationListener {
 
             switch (type) {
                 case "NEW_BOOKING" -> {
-                    // Notify landlord
+                    storageService.save(landlordId, "booking_new",
+                        "Yêu cầu đặt lịch mới",
+                        studentName + " vừa gửi yêu cầu xem phòng \"" + roomTitle + "\"",
+                        "/incoming-bookings");
                     emailService.send(
                         landlord != null ? landlord.getEmail() : null,
                         "Yêu cầu đặt phòng mới — SAF",
@@ -46,7 +51,10 @@ public class BookingNotificationListener {
                     );
                 }
                 case "BOOKING_CONFIRMED" -> {
-                    // Notify student
+                    storageService.save(studentId, "booking_confirmed",
+                        "Lịch hẹn được xác nhận",
+                        "Chủ trọ " + landlordName + " đã xác nhận lịch xem phòng \"" + roomTitle + "\"",
+                        "/my-bookings");
                     emailService.send(
                         student != null ? student.getEmail() : null,
                         "Yêu cầu đặt phòng đã được xác nhận — SAF",
@@ -57,7 +65,10 @@ public class BookingNotificationListener {
                     );
                 }
                 case "BOOKING_REJECTED" -> {
-                    // Notify student
+                    storageService.save(studentId, "booking_rejected",
+                        "Lịch hẹn bị từ chối",
+                        "Chủ trọ " + landlordName + " đã từ chối yêu cầu xem phòng \"" + roomTitle + "\"",
+                        "/my-bookings");
                     emailService.send(
                         student != null ? student.getEmail() : null,
                         "Yêu cầu đặt phòng bị từ chối — SAF",
@@ -68,7 +79,10 @@ public class BookingNotificationListener {
                     );
                 }
                 case "BOOKING_CANCELLED" -> {
-                    // Notify landlord
+                    storageService.save(landlordId, "booking_cancelled",
+                        "Sinh viên hủy lịch hẹn",
+                        studentName + " đã hủy yêu cầu xem phòng \"" + roomTitle + "\"",
+                        "/incoming-bookings");
                     emailService.send(
                         landlord != null ? landlord.getEmail() : null,
                         "Yêu cầu đặt phòng đã bị huỷ — SAF",
@@ -79,7 +93,10 @@ public class BookingNotificationListener {
                     );
                 }
                 case "BOOKING_COMPLETED" -> {
-                    // Notify student
+                    storageService.save(studentId, "booking_completed",
+                        "Xem phòng hoàn thành",
+                        "Bạn đã xem phòng \"" + roomTitle + "\". Hãy để lại đánh giá nhé!",
+                        "/my-bookings");
                     emailService.send(
                         student != null ? student.getEmail() : null,
                         "Lịch xem phòng hoàn thành — SAF",
@@ -90,7 +107,14 @@ public class BookingNotificationListener {
                     );
                 }
                 case "PAYMENT_SUCCESS" -> {
-                    // Notify both
+                    storageService.save(studentId, "payment_success",
+                        "Thanh toán thành công",
+                        "Bạn đã đặt cọc thành công phòng \"" + roomTitle + "\"",
+                        "/my-bookings");
+                    storageService.save(landlordId, "payment_success",
+                        "Phòng đã được thuê",
+                        studentName + " đã hoàn tất thanh toán thuê phòng \"" + roomTitle + "\"",
+                        "/incoming-bookings");
                     emailService.send(
                         student != null ? student.getEmail() : null,
                         "Thanh toán thành công — SAF",

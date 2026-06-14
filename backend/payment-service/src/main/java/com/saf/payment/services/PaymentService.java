@@ -32,7 +32,8 @@ public class PaymentService {
         BookingInfo booking = bookingServiceClient.getBookingById(bookingId).getData();
         if (booking == null) throw new RuntimeException("Booking không tồn tại");
         if (!booking.getStudentId().equals(user.getId())) throw new RuntimeException("Không có quyền thanh toán booking này");
-        if (!"CONFIRMED".equals(booking.getStatus())) throw new RuntimeException("Booking chưa được xác nhận");
+        if (!"CONFIRMED".equals(booking.getStatus()) && !"COMPLETED".equals(booking.getStatus()))
+            throw new RuntimeException("Booking chưa được xác nhận hoặc chưa xem phòng");
 
         RoomInfo room = roomServiceClient.getRoomById(booking.getRoomId()).getData();
         if (room == null) throw new RuntimeException("Phòng không tồn tại");
@@ -87,9 +88,9 @@ public class PaymentService {
         if (!booking.getStudentId().equals(user.getId()) && !booking.getLandlordId().equals(user.getId())) {
             throw new RuntimeException("Không có quyền xem thanh toán này");
         }
-        Payment payment = paymentRepository.findTopByBookingIdOrderByCreatedAtDesc(bookingId)
-                .orElseThrow(() -> new RuntimeException("Chưa có thanh toán"));
-        return toResponse(payment);
+        return paymentRepository.findTopByBookingIdOrderByCreatedAtDesc(bookingId)
+                .map(this::toResponse)
+                .orElse(null);
     }
 
     public boolean hasSuccessPayment(Long roomId) {

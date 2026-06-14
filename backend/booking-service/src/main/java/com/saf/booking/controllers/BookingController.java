@@ -26,14 +26,7 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success("Đặt phòng thành công", response));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<BookingResponse>> getBooking(@PathVariable Long id) {
-        UserInfo user = authorizationUtil.getCurrentUser();
-        BookingResponse response = bookingService.getBookingById(id, user);
-        return ResponseEntity.ok(ApiResponse.success("OK", response));
-    }
-
-    @GetMapping("/my-bookings")
+    @GetMapping("/my")
     public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getMyBookings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -43,7 +36,7 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success("OK", PageResponse.from(result)));
     }
 
-    @GetMapping("/landlord-bookings")
+    @GetMapping("/incoming")
     public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getLandlordBookings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -53,12 +46,31 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success("OK", PageResponse.from(result)));
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<ApiResponse<BookingResponse>> updateStatus(
-            @PathVariable Long id,
-            @RequestParam BookingStatus status) {
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<BookingResponse>> getBooking(@PathVariable Long id) {
         UserInfo user = authorizationUtil.getCurrentUser();
-        BookingResponse response = bookingService.updateStatus(id, status, user);
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái thành công", response));
+        BookingResponse response = bookingService.getBookingById(id, user);
+        return ResponseEntity.ok(ApiResponse.success("OK", response));
+    }
+
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<ApiResponse<BookingResponse>> confirmBooking(@PathVariable Long id) {
+        UserInfo user = authorizationUtil.getCurrentUser();
+        BookingResponse response = bookingService.updateStatus(id, BookingStatus.CONFIRMED, user);
+        return ResponseEntity.ok(ApiResponse.success("Đã xác nhận lịch hẹn", response));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(@PathVariable Long id) {
+        UserInfo user = authorizationUtil.getCurrentUser();
+        BookingResponse response = bookingService.updateStatus(id, BookingStatus.CANCELLED, user);
+        return ResponseEntity.ok(ApiResponse.success("Đã hủy lịch hẹn", response));
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<ApiResponse<BookingResponse>> completeBooking(@PathVariable Long id) {
+        UserInfo user = authorizationUtil.getCurrentUser();
+        BookingResponse response = bookingService.updateStatus(id, BookingStatus.COMPLETED, user);
+        return ResponseEntity.ok(ApiResponse.success("Đã hoàn thành lịch hẹn", response));
     }
 }

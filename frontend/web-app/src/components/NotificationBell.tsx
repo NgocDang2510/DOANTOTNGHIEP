@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, Trash2, CalendarCheck, CalendarX, Calendar, CheckCircle } from 'lucide-react';
+import { Bell, Check, Trash2, CalendarCheck, CalendarX, Calendar, CheckCircle, CreditCard } from 'lucide-react';
 import { useNotificationStore, type AppNotification } from '../stores/notificationStore';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   booking_new:       <Calendar className="w-4 h-4 text-blue-500" />,
   booking_confirmed: <CalendarCheck className="w-4 h-4 text-green-500" />,
-  booking_cancelled: <CalendarX className="w-4 h-4 text-red-500" />,
+  booking_rejected:  <CalendarX className="w-4 h-4 text-red-500" />,
+  booking_cancelled: <CalendarX className="w-4 h-4 text-orange-500" />,
   booking_completed: <CheckCircle className="w-4 h-4 text-purple-500" />,
+  payment_success:   <CreditCard className="w-4 h-4 text-emerald-500" />,
 };
 
 function timeAgo(dateStr: string) {
@@ -22,11 +24,17 @@ function timeAgo(dateStr: string) {
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const { notifications, markAllRead, clearAll } = useNotificationStore();
+  const { notifications, markAllRead, clearAll, startPolling } = useNotificationStore();
   const panelRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // Start polling on mount, stop on unmount
+  useEffect(() => {
+    const stop = startPolling();
+    return stop;
+  }, [startPolling]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -40,8 +48,9 @@ export default function NotificationBell() {
   }, []);
 
   const handleOpen = () => {
-    setOpen(prev => !prev);
-    if (!open && unreadCount > 0) markAllRead();
+    const next = !open;
+    setOpen(next);
+    if (next && unreadCount > 0) markAllRead();
   };
 
   const handleClick = (n: AppNotification) => {
@@ -83,7 +92,7 @@ export default function NotificationBell() {
                   </button>
                   <button
                     onClick={clearAll}
-                    title="Xóa tất cả"
+                    title="Xóa tất cả (chỉ trên màn hình)"
                     className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

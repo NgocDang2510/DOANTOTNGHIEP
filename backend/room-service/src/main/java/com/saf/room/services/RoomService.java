@@ -91,14 +91,7 @@ public class RoomService {
     public RoomResponse changeStatus(UserInfo currentUser, Long roomId, RoomStatus newStatus) {
         Room room = getById(roomId);
         checkOwnership(currentUser, room);
-        RoomStatus statusToSet = newStatus;
-        if (newStatus == RoomStatus.AVAILABLE) {
-            try {
-                Boolean hasPaid = paymentServiceClient.hasSuccessPayment(roomId).getData();
-                if (Boolean.TRUE.equals(hasPaid)) statusToSet = RoomStatus.RENTED;
-            } catch (Exception ignored) {}
-        }
-        room.setStatus(statusToSet);
+        room.setStatus(newStatus);
         return toResponse(roomRepository.save(room));
     }
 

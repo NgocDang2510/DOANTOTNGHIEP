@@ -1,5 +1,6 @@
 package com.saf.payment.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
+@Slf4j
 public class VNPayService {
 
     @Value("${vnpay.tmn-code}")
@@ -27,8 +29,10 @@ public class VNPayService {
 
     public String createPaymentUrl(Long bookingId, long amount, String ipAddr) {
         String txnRef = bookingId + "_" + System.currentTimeMillis();
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        TimeZone vnpTz = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
+        Calendar cal = Calendar.getInstance(vnpTz);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        formatter.setTimeZone(vnpTz);
         String vnpCreateDate = formatter.format(cal.getTime());
         cal.add(Calendar.MINUTE, 15);
         String vnpExpireDate = formatter.format(cal.getTime());
@@ -51,16 +55,25 @@ public class VNPayService {
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            String enc = URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII)
-                    + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII);
-            hashData.append(enc).append('&');
-            query.append(enc).append('&');
+            String key = entry.getKey();
+            String value = entry.getValue();
+            // VNPay PHP server dùng urlencode() cho cả hashData lẫn query string
+            String encodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8);
+            hashData.append(key).append('=').append(encodedValue).append('&');
+            query.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
+                 .append('=')
+                 .append(encodedValue)
+                 .append('&');
         }
         hashData.deleteCharAt(hashData.length() - 1);
         query.deleteCharAt(query.length() - 1);
 
         String secureHash = hmacSHA512(hashSecret, hashData.toString());
-        return vnpayUrl + "?" + query + "&vnp_SecureHash=" + secureHash;
+        log.info("[VNPay] hashData: {}", hashData);
+        log.info("[VNPay] secureHash: {}", secureHash);
+        String fullUrl = vnpayUrl + "?" + query + "&vnp_SecureHashType=HmacSHA512&vnp_SecureHash=" + secureHash;
+        log.info("[VNPay] fullUrl: {}", fullUrl);
+        return fullUrl;
     }
 
     public boolean verifyReturn(Map<String, String> params) {
@@ -71,10 +84,8 @@ public class VNPayService {
 
         StringBuilder hashData = new StringBuilder();
         for (Map.Entry<String, String> entry : filtered.entrySet()) {
-            hashData.append(URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII))
-                    .append('=')
-                    .append(URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
-                    .append('&');
+            hashData.append(entry.getKey()).append('=')
+                    .append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).append('&');
         }
         hashData.deleteCharAt(hashData.length() - 1);
         return hmacSHA512(hashSecret, hashData.toString()).equalsIgnoreCase(receivedHash);

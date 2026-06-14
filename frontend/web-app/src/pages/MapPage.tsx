@@ -13,6 +13,17 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl: markerIcon, iconRetinaUrl: markerIcon2x, shadowUrl: markerShadow });
 
+const userLocationIcon = L.divIcon({
+  className: '',
+  html: `<svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.5 0C5.596 0 0 5.596 0 12.5c0 8.75 12.5 28.5 12.5 28.5S25 21.25 25 12.5C25 5.596 19.404 0 12.5 0z" fill="#EF4444" stroke="#B91C1C" stroke-width="1.5"/>
+    <circle cx="12.5" cy="12.5" r="5" fill="white"/>
+  </svg>`,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+});
+
 const ROOM_TYPE_LABELS: Record<string, string> = {
   SINGLE: 'Phòng đơn', SHARED: 'Ở ghép', APARTMENT: 'Căn hộ mini', HOUSE: 'Nhà nguyên căn',
 };
@@ -87,9 +98,9 @@ const MapPage = () => {
           <FlyTo coords={userCoords} />
 
           {userCoords && (
-            <Marker position={userCoords}>
+            <Marker position={userCoords} icon={userLocationIcon}>
               <Popup>
-                <p className="font-bold text-sm">Vị trí của bạn</p>
+                <p className="font-bold text-sm">📍 Vị trí của bạn</p>
               </Popup>
             </Marker>
           )}

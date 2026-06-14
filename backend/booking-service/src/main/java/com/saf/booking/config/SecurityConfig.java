@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
             )
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint((req, res, ex) -> res.sendError(401, "Unauthorized")))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

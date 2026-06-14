@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartAccommodationFinder — Tổng quan dự án</title>
+  <style>
+    :root {
+      --blue:#3b82f6; --blue-dark:#1e40af; --blue-light:#eff6ff;
+      --green:#22c55e; --green-dark:#15803d; --green-light:#f0fdf4;
+      --orange:#f97316; --orange-light:#fff7ed;
+      --purple:#a855f7; --purple-light:#faf5ff;
+      --pink:#ec4899; --pink-light:#fdf2f8;
+      --cyan:#06b6d4; --cyan-light:#ecfeff;
+      --yellow:#eab308; --yellow-light:#fefce8;
+      --red:#ef4444; --red-light:#fef2f2;
+      --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+      --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+      --gray-600:#4b5563; --gray-700:#374151;
+      --gray-800:#1f2937; --gray-900:#111827;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:var(--gray-800);line-height:1.7;font-size:15px;}
+
+    /* ── STICKY NAV ── */
+    .toc{
+      position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);
+      backdrop-filter:blur(8px);border-bottom:1px solid var(--gray-200);
+      padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+    }
+    .toc a{
+      font-size:12px;font-weight:600;color:var(--gray-600);text-decoration:none;
+      padding:4px 12px;border-radius:99px;border:1px solid var(--gray-200);
+      transition:all .15s;white-space:nowrap;
+    }
+    .toc a:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+    .toc-label{font-size:11px;font-weight:700;color:var(--gray-400);margin-right:4px;white-space:nowrap;}
+
+    /* ── HERO ── */
+    .hero{
+      background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#4c1d95 100%);
+      color:#fff;padding:72px 32px 56px;text-align:center;position:relative;overflow:hidden;
+    }
+    .hero::before{
+      content:'';position:absolute;inset:0;
+      background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+      border-radius:99px;padding:6px 18px;font-size:13px;margin-bottom:24px;
+    }
+    .hero h1{font-size:clamp(32px,6vw,60px);font-weight:900;letter-spacing:-2px;margin-bottom:16px;line-height:1.1;}
+    .hero p{font-size:18px;opacity:.8;max-width:640px;margin:0 auto 32px;}
+    .hero-stats{
+      display:flex;gap:0;justify-content:center;flex-wrap:wrap;
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;max-width:700px;margin:0 auto;overflow:hidden;
+    }
+    .hero-stat{
+      flex:1;min-width:120px;padding:20px 16px;text-align:center;
+      border-right:1px solid rgba(255,255,255,.1);
+    }
+    .hero-stat:last-child{border-right:none;}
+    .hero-stat-num{font-size:28px;font-weight:800;color:#60a5fa;}
+    .hero-stat-label{font-size:11px;opacity:.6;margin-top:4px;}
+
+    /* ── CONTAINER & SECTION ── */
+    .container{max-width:1100px;margin:0 auto;padding:0 24px;}
+    section{padding:64px 0;}
+    section:nth-child(odd){background:#fff;}
+
+    /* ── SECTION HEADER ── */
+    .sec-head{margin-bottom:40px;}
+    .sec-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+      color:var(--blue);background:var(--blue-light);
+      padding:4px 12px;border-radius:99px;margin-bottom:12px;
+    }
+    .sec-title{font-size:clamp(22px,3vw,32px);font-weight:800;color:var(--gray-900);margin-bottom:8px;line-height:1.2;}
+    .sec-sub{font-size:15px;color:var(--gray-500);max-width:600px;}
+
+    /* ── CALLOUT ── */
+    .callout{
+      border-radius:12px;padding:18px 20px;margin:20px 0;
+      display:flex;gap:14px;align-items:flex-start;
+    }
+    .callout-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+    .callout-body{font-size:14px;line-height:1.7;}
+    .callout-body strong{display:block;font-size:15px;margin-bottom:4px;}
+    .callout.blue  {background:#eff6ff;border-left:4px solid var(--blue);}
+    .callout.green {background:#f0fdf4;border-left:4px solid var(--green);}
+    .callout.orange{background:#fff7ed;border-left:4px solid var(--orange);}
+    .callout.purple{background:#faf5ff;border-left:4px solid var(--purple);}
+    .callout.yellow{background:#fefce8;border-left:4px solid var(--yellow);}
+
+    /* ── PORT EXPLAINER ── */
+    .port-box{
+      background:var(--gray-900);color:#e2e8f0;border-radius:14px;
+      padding:28px 32px;font-family:'Consolas',monospace;font-size:14px;
+      line-height:2;margin-top:24px;
+    }
+    .port-box .comment{color:#64748b;}
+    .port-box .highlight{color:#60a5fa;font-weight:700;}
+    .port-box .green{color:#4ade80;}
+    .port-box .orange{color:#fb923c;}
+    .port-box .gray{color:#94a3b8;}
+
+    /* ── ANALOGY CARD ── */
+    .analogy{
+      background:linear-gradient(135deg,#fffbeb,#fef3c7);
+      border:1px solid #fde68a;border-radius:14px;
+      padding:24px 28px;margin:24px 0;
+    }
+    .analogy-title{font-weight:800;font-size:16px;color:#92400e;margin-bottom:10px;display:flex;gap:8px;align-items:center;}
+    .analogy-body{font-size:14px;color:#78350f;line-height:1.8;}
+    .analogy-body ul{padding-left:20px;margin-top:8px;}
+    .analogy-body li{margin-bottom:6px;}
+
+    /* ── ROLES ── */
+    .roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    @media(max-width:680px){.roles-grid{grid-template-columns:1fr;}}
+    .role-card{border-radius:16px;overflow:hidden;border:1px solid var(--gray-200);background:#fff;}
+    .role-header{padding:24px;text-align:center;}
+    .role-icon{font-size:48px;margin-bottom:12px;}
+    .role-name{font-size:20px;font-weight:800;margin-bottom:6px;}
+    .role-desc{font-size:13px;color:var(--gray-500);}
+    .role-body{padding:0 20px 20px;}
+    .role-perms{list-style:none;}
+    .role-perms li{
+      font-size:13px;color:var(--gray-600);
+      padding:7px 0;border-bottom:1px solid var(--gray-100);
+      display:flex;gap:8px;align-items:flex-start;
+    }
+    .role-perms li:last-child{border-bottom:none;}
+    .role-perms li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0;margin-top:1px;}
+
+    /* ── TECH GRID ── */
+    .tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+    .tech-card{
+      border-radius:12px;padding:20px 14px;text-align:center;
+      border:1px solid var(--gray-200);background:#fff;
+      transition:transform .2s,box-shadow .2s;cursor:default;
+    }
+    .tech-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1);}
+    .tech-icon{font-size:32px;margin-bottom:10px;}
+    .tech-name{font-weight:700;font-size:13px;color:var(--gray-700);}
+    .tech-why{font-size:11px;color:var(--gray-400);margin-top:5px;line-height:1.4;}
+
+    /* ── ARCH ── */
+    .arch-wrap{background:#0f172a;border-radius:16px;padding:40px;overflow-x:auto;}
+    .arch-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;}
+    .arch-sep{text-align:center;color:#334155;font-size:18px;letter-spacing:6px;margin:8px 0;}
+    .arch-label-row{text-align:center;margin-bottom:10px;}
+    .arch-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569;
+      display:inline-block;background:#1e293b;padding:3px 12px;border-radius:99px;}
+    .anode{
+      border-radius:10px;padding:10px 16px;font-size:12px;font-weight:600;
+      display:flex;align-items:center;gap:7px;white-space:nowrap;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .an-client {background:#1e3a5f;color:#93c5fd;}
+    .an-gw     {background:#1c1917;color:#a8a29e;}
+    .an-svc    {background:#1e1b4b;color:#a5b4fc;}
+    .an-spring {background:#14532d;color:#86efac;}
+    .an-node   {background:#1a2e05;color:#bef264;}
+    .an-mq     {background:#451a03;color:#fed7aa;}
+    .an-db-m   {background:#1e3a5f;color:#7dd3fc;}
+    .an-db-n   {background:#14532d;color:#6ee7b7;}
+
+    /* ── SERVICES ── */
+    .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;}
+    .svc-card{border-radius:14px;border:1px solid var(--gray-200);background:#fff;overflow:hidden;}
+    .svc-head{padding:16px 20px;display:flex;align-items:center;gap:12px;}
+    .svc-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .svc-title{font-weight:800;font-size:15px;}
+    .svc-meta{font-size:11px;opacity:.65;margin-top:2px;}
+    .svc-body{padding:0 20px 20px;}
+    .svc-why{
+      font-size:13px;color:var(--gray-700);margin-bottom:14px;
+      background:var(--gray-50);border-radius:8px;padding:12px 14px;
+      border-left:3px solid var(--gray-300);
+    }
+    .svc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+    .tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--gray-100);color:var(--gray-600);}
+    .ep-list{list-style:none;}
+    .ep-list li{
+      font-size:12px;font-family:'Consolas',monospace;
+      padding:5px 8px;border-radius:6px;margin-bottom:4px;
+      background:var(--gray-50);display:flex;align-items:center;gap:8px;
+    }
+    .mt{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0;min-width:46px;text-align:center;}
+    .get   {background:#dcfce7;color:#166534;}
+    .post  {background:#dbeafe;color:#1e40af;}
+    .put   {background:#fef3c7;color:#92400e;}
+    .patch {background:#f3e8ff;color:#6b21a8;}
+    .del   {background:#fee2e2;color:#991b1b;}
+    .ws    {background:#e0f2fe;color:#075985;}
+
+    /* ── FLOWS ── */
+    .flow-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px;}
+    .flow-card{border-radius:14px;border:1px solid var(--gray-200);background:#fff;overflow:hidden;}
+    .flow-head{padding:16px 20px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;}
+    .flow-body{padding:0 20px 20px;}
+    .flow-steps{list-style:none;counter-reset:st;}
+    .flow-steps li{
+      counter-increment:st;
+      display:flex;gap:12px;align-items:flex-start;
+      padding:10px 0;border-bottom:1px solid var(--gray-100);
+      font-size:13px;color:var(--gray-700);
+    }
+    .flow-steps li:last-child{border-bottom:none;}
+    .flow-steps li::before{
+      content:counter(st);min-width:26px;height:26px;border-radius:50%;
+      background:var(--blue);color:#fff;font-size:12px;font-weight:700;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:0px;
+    }
+    code{background:var(--gray-100);padding:1px 6px;border-radius:4px;font-size:12px;font-family:'Consolas',monospace;}
+
+    /* ── Q&A ── */
+    .qa-grid{display:grid;gap:16px;}
+    .qa-item{
+      border-radius:14px;border:1px solid var(--gray-200);
+      background:#fff;overflow:hidden;
+    }
+    .qa-q{
+      padding:18px 22px;cursor:pointer;
+      display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+      font-weight:700;font-size:15px;color:var(--gray-800);
+      transition:background .15s;
+    }
+    .qa-q:hover{background:var(--gray-50);}
+    .qa-q-badge{
+      font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;
+      flex-shrink:0;margin-top:2px;white-space:nowrap;
+    }
+    .badge-arch {background:#dbeafe;color:#1e40af;}
+    .badge-tech {background:#dcfce7;color:#166534;}
+    .badge-sec  {background:#fef3c7;color:#92400e;}
+    .badge-design{background:#f3e8ff;color:#6b21a8;}
+    .badge-scale{background:#fee2e2;color:#991b1b;}
+    .qa-a{
+      padding:0 22px 20px;font-size:14px;color:var(--gray-600);
+      line-height:1.8;border-top:1px solid var(--gray-100);
+    }
+    .qa-a p{margin-top:12px;}
+    .qa-a ul{padding-left:20px;margin-top:8px;}
+    .qa-a li{margin-bottom:6px;}
+    .qa-a strong{color:var(--gray-800);}
+
+    /* ── COMPARE TABLE ── */
+    table.compare{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;}
+    table.compare th{
+      background:var(--gray-800);color:#fff;
+      padding:10px 16px;text-align:left;font-size:12px;font-weight:700;
+    }
+    table.compare td{
+      padding:10px 16px;border-bottom:1px solid var(--gray-100);
+      vertical-align:top;
+    }
+    table.compare tr:last-child td{border-bottom:none;}
+    table.compare tr:hover td{background:var(--gray-50);}
+    .check{color:var(--green);font-weight:700;}
+    .cross{color:var(--red);}
+
+    /* ── DB ── */
+    .db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
+    .db-card{border-radius:12px;border:1px solid var(--gray-200);background:#fff;padding:18px;}
+    .db-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .db-ico{font-size:24px;}
+    .db-name{font-weight:700;font-size:13px;}
+    .db-type{font-size:11px;color:var(--gray-400);}
+    .db-tables{list-style:none;}
+    .db-tables li{
+      font-size:11px;font-family:'Consolas',monospace;
+      padding:4px 8px;background:var(--gray-50);border-radius:5px;
+      margin-bottom:4px;color:var(--gray-600);
+    }
+
+    /* ── FOOTER ── */
+    footer{background:var(--gray-900);color:var(--gray-400);text-align:center;padding:40px 24px;font-size:13px;}
+    footer h3{color:#f1f5f9;font-size:18px;margin-bottom:8px;}
+    .footer-grid{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin:24px 0;font-size:12px;}
+    .footer-col{text-align:left;}
+    .footer-col h4{color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+    .footer-col ul{list-style:none;}
+    .footer-col li{padding:3px 0;color:#64748b;}
+
+    @media(max-width:768px){
+      .svc-grid,.flow-grid{grid-template-columns:1fr;}
+      .toc{display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="toc">
+  <span class="toc-label">📖 MỤC LỤC</span>
+  <a href="#overview">Tổng quan</a>
+  <a href="#why-port">Cổng 80</a>
+  <a href="#roles">Vai trò</a>
+  <a href="#tech">Công nghệ chi tiết</a>
+  <a href="#arch">Kiến trúc</a>
+  <a href="#services">Microservices</a>
+  <a href="#flows">Luồng hoạt động</a>
+  <a href="#db">Database</a>
+  <a href="#qa">❓ Câu hỏi thường gặp</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🏆 Đồ án tốt nghiệp / Capstone Project</div>
+  <h1>SmartAccommodation<br>Finder</h1>
+  <p>Nền tảng tìm kiếm &amp; đặt phòng trọ thông minh — kết nối sinh viên với chủ nhà thông qua kiến trúc microservices hiện đại</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">Microservices</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Databases</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">Ngôn ngữ</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">12</div><div class="hero-stat-label">Docker Containers</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Real-time</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ OVERVIEW -->
+<section id="overview">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">📌 Giới thiệu</div>
+      <h2 class="sec-title">Dự án này là gì?</h2>
+      <p class="sec-sub">Hiểu đơn giản nhất trước khi đi vào chi tiết kỹ thuật</p>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <strong>Nói đơn giản:</strong>
+        SmartAccommodationFinder (SAF) là một ứng dụng web giống như <b>Airbnb</b> nhưng dành cho sinh viên thuê phòng trọ tại Việt Nam. Sinh viên có thể tìm phòng, đặt lịch xem, chat với chủ nhà và thanh toán đặt cọc online. Chủ nhà đăng tin, xác nhận lịch hẹn và nhận thông báo qua email.
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">🏪 Hình dung như một tòa nhà thương mại</div>
+      <div class="analogy-body">
+        Thay vì xây 1 tòa nhà khổng lồ làm tất cả mọi thứ (kiểu cũ — Monolithic), chúng ta xây <b>nhiều tòa nhà nhỏ chuyên dụng</b>, mỗi tòa phụ trách 1 việc:
+        <ul>
+          <li>🏢 Tòa <b>Auth</b> = Phòng bảo vệ — lo đăng nhập, cấp thẻ ra vào (JWT)</li>
+          <li>🏢 Tòa <b>Room</b> = Phòng kinh doanh — quản lý danh sách phòng trọ</li>
+          <li>🏢 Tòa <b>Booking</b> = Quầy đặt lịch — nhận và xử lý lịch hẹn xem phòng</li>
+          <li>🏢 Tòa <b>Payment</b> = Quầy thu ngân — xử lý thanh toán VNPay</li>
+          <li>🏢 Tòa <b>Notification</b> = Bộ phận thông báo — gửi email &amp; lưu thông báo</li>
+          <li>🏢 Tòa <b>Messaging</b> = Tổng đài — chat real-time giữa các bên</li>
+          <li>🏢 Tòa <b>AI Chat</b> = Nhân viên tư vấn AI — hỏi đáp tự động</li>
+        </ul>
+        Tất cả các tòa kết nối nhau qua <b>Nginx</b> — đóng vai trò như <i>lễ tân tổng</i> nhận khách và chỉ đường.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PORT EXPLAINER -->
+<section id="why-port">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">🔌 Cổng kết nối</div>
+      <h2 class="sec-title">Tại sao chỉ gõ <code>localhost</code> mà không cần <code>:port</code>?</h2>
+      <p class="sec-sub">Câu hỏi hay — đây là điểm nhiều người hay nhầm lẫn</p>
+    </div>
+
+    <div class="callout green">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <strong>Câu trả lời ngắn:</strong>
+        Cổng mặc định của HTTP là <b>80</b>. Khi bạn gõ <code>http://localhost</code>, trình duyệt tự hiểu là <code>http://localhost:80</code>. Giống như khi bạn gọi điện — nếu không bấm thêm nhánh máy lẻ thì tổng đài (số 80) tự nhận.
+      </div>
+    </div>
+
+    <div class="port-box">
+      <div class="comment">// Người dùng gõ trên trình duyệt:</div>
+      <div><span class="highlight">http://localhost</span>  <span class="comment">← trình duyệt tự hiểu là port 80</span></div>
+      <br>
+      <div class="comment">// Nginx lắng nghe port 80, nhận request và chỉ đường:</div>
+      <div><span class="green">/api/auth/*</span>        <span class="gray">──────→</span>  <span class="orange">auth-service:8081</span>   <span class="comment">(bên trong Docker)</span></div>
+      <div><span class="green">/api/rooms/*</span>       <span class="gray">──────→</span>  <span class="orange">room-service:8082</span>   <span class="comment">(bên trong Docker)</span></div>
+      <div><span class="green">/api/bookings/*</span>    <span class="gray">──────→</span>  <span class="orange">booking-service:8083</span> <span class="comment">(bên trong Docker)</span></div>
+      <div><span class="green">/api/payments/*</span>    <span class="gray">──────→</span>  <span class="orange">payment-service:8084</span> <span class="comment">(bên trong Docker)</span></div>
+      <div><span class="green">/api/notifications/*</span><span class="gray">──────→</span>  <span class="orange">notification-service:8085</span></div>
+      <div><span class="green">/api/messages/*</span>    <span class="gray">──────→</span>  <span class="orange">nodejs-messaging:3001</span></div>
+      <div><span class="green">/*</span>                 <span class="gray">──────→</span>  <span class="orange">web-app:80</span>          <span class="comment">(React frontend)</span></div>
+      <br>
+      <div class="comment">// Các port 8081, 8082... hoàn toàn KHÔNG được expose ra ngoài Docker</div>
+      <div class="comment">// Người dùng KHÔNG thể gõ localhost:8081 — chỉ Nginx mới được gọi vào</div>
+    </div>
+
+    <div class="callout orange" style="margin-top:20px">
+      <div class="callout-icon">🔒</div>
+      <div class="callout-body">
+        <strong>Lợi ích bảo mật:</strong>
+        Các service nội bộ (<code>:8081</code>, <code>:8082</code>...) <b>không lộ ra internet</b>. Người ngoài chỉ thấy duy nhất cổng 80. Nginx đóng vai trò "cánh cửa duy nhất" — kiểm soát toàn bộ traffic vào/ra. Đây gọi là <b>API Gateway pattern</b>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ ROLES -->
+<section id="roles">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">👤 Vai trò</div>
+      <h2 class="sec-title">3 loại người dùng trong hệ thống</h2>
+      <p class="sec-sub">Mỗi vai trò có quyền hạn và giao diện riêng biệt</p>
+    </div>
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="role-header" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">
+          <div class="role-icon">🎓</div>
+          <div class="role-name" style="color:var(--blue-dark)">Sinh viên</div>
+          <div class="role-desc">Người tìm &amp; thuê phòng</div>
+        </div>
+        <div class="role-body">
+          <ul class="role-perms">
+            <li>Tìm kiếm phòng theo giá, quận, tiện ích</li>
+            <li>Xem vị trí phòng trên bản đồ (Leaflet.js)</li>
+            <li>Đặt lịch xem phòng trực tuyến</li>
+            <li>Thanh toán đặt cọc qua VNPay</li>
+            <li>Chat real-time với chủ nhà</li>
+            <li>Đánh giá &amp; nhận xét phòng đã xem</li>
+            <li>Lưu phòng yêu thích</li>
+            <li>Nhận thông báo khi lịch được xác nhận/từ chối</li>
+          </ul>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-header" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
+          <div class="role-icon">🏠</div>
+          <div class="role-name" style="color:var(--green-dark)">Chủ nhà</div>
+          <div class="role-desc">Người đăng tin cho thuê</div>
+        </div>
+        <div class="role-body">
+          <ul class="role-perms">
+            <li>Đăng &amp; quản lý tin phòng + upload ảnh</li>
+            <li>Xác nhận hoặc từ chối lịch xem phòng</li>
+            <li>Nhận thông báo ngay khi có đặt lịch mới</li>
+            <li>Chat trực tiếp với sinh viên</li>
+            <li>Xem thống kê: lượt xem, doanh thu, lịch hẹn</li>
+            <li>Nhận email &amp; thông báo trong app</li>
+          </ul>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-header" style="background:linear-gradient(135deg,#faf5ff,#e9d5ff)">
+          <div class="role-icon">🛡</div>
+          <div class="role-name" style="color:#6b21a8">Admin</div>
+          <div class="role-desc">Quản trị viên hệ thống</div>
+        </div>
+        <div class="role-body">
+          <ul class="role-perms">
+            <li>Xem toàn bộ người dùng &amp; hoạt động</li>
+            <li>Duyệt, ẩn hoặc xóa phòng vi phạm</li>
+            <li>Xem thống kê toàn hệ thống</li>
+            <li>Quản lý giao dịch thanh toán</li>
+            <li>Điều chỉnh trạng thái booking</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ TECH STACK -->
+<section id="tech">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">🔧 Công nghệ</div>
+      <h2 class="sec-title">Technology Stack — Chi tiết từng thư viện</h2>
+      <p class="sec-sub">Liệt kê đầy đủ các công nghệ, thư viện, version được dùng trong từng tầng</p>
+    </div>
+
+    <div class="callout purple" style="margin-bottom:32px">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-body">
+        <strong>Polyglot Architecture — Tại sao dùng 2 ngôn ngữ backend?</strong>
+        Spring Boot (Java 17) tốt cho business logic phức tạp, transaction ACID, bảo mật. Node.js tốt hơn cho I/O bất đồng bộ &amp; nhiều kết nối đồng thời (WebSocket chat, streaming AI). Dùng đúng công cụ đúng việc thay vì ép 1 ngôn ngữ làm tất cả.
+      </div>
+    </div>
+
+    <!-- ── FRONTEND WEB ── -->
+    <h3 style="font-size:18px;font-weight:800;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span style="background:#eff6ff;color:var(--blue);padding:4px 12px;border-radius:8px;font-size:13px">⚛️ Frontend — Web App</span>
+    </h3>
+
+    <div style="overflow-x:auto;margin-bottom:32px">
+      <table class="compare" style="font-size:13px">
+        <tr><th style="width:200px">Thư viện / Công nghệ</th><th style="width:100px">Version</th><th>Vai trò &amp; Lý do chọn</th></tr>
+        <tr>
+          <td><strong>React</strong></td><td>19.2</td>
+          <td>Core UI framework. Dùng hooks (<code>useState</code>, <code>useEffect</code>, <code>useCallback</code>, <code>useRef</code>) để quản lý lifecycle component. Virtual DOM tối ưu render.</td>
+        </tr>
+        <tr>
+          <td><strong>TypeScript</strong></td><td>5.9</td>
+          <td>Thêm kiểu tĩnh vào JavaScript. Phát hiện lỗi sai kiểu tại compile-time, IDE autocomplete tốt hơn, code dễ maintain khi team lớn.</td>
+        </tr>
+        <tr>
+          <td><strong>Vite</strong></td><td>8.0</td>
+          <td>Build tool thay thế Webpack. Dev server khởi động gần như tức thì nhờ ES Module native, HMR (Hot Module Replacement) nhanh hơn CRA nhiều lần.</td>
+        </tr>
+        <tr>
+          <td><strong>React Router DOM</strong></td><td>v7.13</td>
+          <td>Routing phía client (SPA). Định nghĩa các route như <code>/rooms</code>, <code>/bookings</code>, <code>/admin</code>... Dùng <code>&lt;Navigate&gt;</code> để redirect, <code>useParams</code> để lấy params từ URL.</td>
+        </tr>
+        <tr>
+          <td><strong>Zustand</strong></td><td>5.0</td>
+          <td>Global state management — nhẹ hơn Redux (không cần boilerplate action/reducer), đơn giản hơn Context API. Lưu trạng thái auth (token, user info), danh sách thông báo dùng chung toàn app.</td>
+        </tr>
+        <tr>
+          <td><strong>Tailwind CSS</strong></td><td>4.2</td>
+          <td>Utility-first CSS framework. Viết style trực tiếp trong JSX qua class names, không cần file CSS riêng. Dark mode toggle tích hợp sẵn. PostCSS plugin tự purge class không dùng khi build.</td>
+        </tr>
+        <tr>
+          <td><strong>Axios</strong></td><td>1.13</td>
+          <td>HTTP client cho các API call. Cấu hình <b>interceptors</b>: tự động đính kèm JWT vào header <code>Authorization: Bearer</code> mọi request; tự động gọi <code>/auth/refresh</code> khi nhận 401, sau đó retry request cũ.</td>
+        </tr>
+        <tr>
+          <td><strong>Socket.IO Client</strong></td><td>4.8</td>
+          <td>Kết nối WebSocket tới Messaging Service. Lắng nghe sự kiện <code>notification</code>, <code>new_message</code> từ server. Tự động fallback về HTTP polling nếu WebSocket không khả dụng.</td>
+        </tr>
+        <tr>
+          <td><strong>Leaflet.js + react-leaflet</strong></td><td>1.9 / 5.0</td>
+          <td>Hiển thị bản đồ OpenStreetMap. Cho phép user chọn vị trí phòng bằng cách click trên bản đồ. Tích hợp Nominatim API để geocoding (tọa độ → địa chỉ văn bản và ngược lại).</td>
+        </tr>
+        <tr>
+          <td><strong>Recharts</strong></td><td>2.15</td>
+          <td>Thư viện chart cho trang Thống kê (chủ nhà &amp; admin). Vẽ BarChart (doanh thu theo tháng), LineChart (lượt xem phòng), PieChart (tỷ lệ booking status).</td>
+        </tr>
+        <tr>
+          <td><strong>react-markdown + remark-gfm</strong></td><td>10.1 / 4.0</td>
+          <td>Render nội dung Markdown thành HTML trong phần AI Chat. <code>remark-gfm</code> bổ sung GitHub Flavored Markdown (bảng, checklist, strikethrough).</td>
+        </tr>
+        <tr>
+          <td><strong>react-syntax-highlighter</strong></td><td>16.1</td>
+          <td>Highlight cú pháp code block trong tin nhắn AI — hiển thị đúng màu cho code Java, JS, SQL... mà AI trả về.</td>
+        </tr>
+        <tr>
+          <td><strong>lucide-react</strong></td><td>0.577</td>
+          <td>Bộ icon SVG nhất quán toàn app (Bell, Home, MapPin, User, Calendar...). Tree-shakeable — chỉ bundle các icon thực sự dùng.</td>
+        </tr>
+        <tr>
+          <td><strong>date-fns</strong></td><td>4.1</td>
+          <td>Format ngày giờ: hiển thị "3 phút trước", "hôm qua 14:30"... Nhẹ hơn moment.js, tree-shakeable, không mutate.</td>
+        </tr>
+        <tr>
+          <td><strong>qrcode.react</strong></td><td>4.2</td>
+          <td>Tạo QR code hiển thị trên trang thanh toán VNPay để người dùng quét bằng điện thoại.</td>
+        </tr>
+        <tr>
+          <td><strong>clsx + tailwind-merge</strong></td><td>2.1 / 3.5</td>
+          <td>Tiện ích kết hợp class names có điều kiện. <code>clsx</code> ghép class động, <code>tailwind-merge</code> tự giải quyết conflict giữa các Tailwind class (vd: <code>p-2</code> vs <code>p-4</code>).</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ── FRONTEND MOBILE ── -->
+    <h3 style="font-size:18px;font-weight:800;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span style="background:#f0fdf4;color:var(--green-dark);padding:4px 12px;border-radius:8px;font-size:13px">📱 Frontend — Mobile App</span>
+    </h3>
+    <div style="overflow-x:auto;margin-bottom:32px">
+      <table class="compare" style="font-size:13px">
+        <tr><th style="width:200px">Thư viện / Công nghệ</th><th style="width:100px">Version</th><th>Vai trò &amp; Lý do chọn</th></tr>
+        <tr>
+          <td><strong>React Native</strong></td><td>0.74+</td>
+          <td>Framework mobile cross-platform. Dùng chung business logic, API calls, và một phần state management với web. Compile ra native code iOS và Android.</td>
+        </tr>
+        <tr>
+          <td><strong>Expo</strong></td><td>51+</td>
+          <td>Toolchain cho React Native. Đơn giản hoá setup, cung cấp sẵn các API native (camera, location, notifications). Expo Go để test trên điện thoại thật không cần build APK.</td>
+        </tr>
+        <tr>
+          <td><strong>React Navigation</strong></td><td>6+</td>
+          <td>Routing &amp; navigation cho mobile. Stack Navigator (push/pop màn hình), Tab Navigator (thanh tab phía dưới), Drawer Navigator (menu trượt). Tương đương React Router DOM trên web.</td>
+        </tr>
+        <tr>
+          <td><strong>Axios + Socket.IO Client</strong></td><td>—</td>
+          <td>Dùng lại cùng thư viện như web: Axios gọi API, Socket.IO nhận thông báo và chat real-time trên mobile.</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ── BACKEND SPRING BOOT ── -->
+    <h3 style="font-size:18px;font-weight:800;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span style="background:#f0fdf4;color:var(--green-dark);padding:4px 12px;border-radius:8px;font-size:13px">☕ Backend — Spring Boot (Java 17)</span>
+    </h3>
+    <div class="callout green" style="margin-bottom:16px">
+      <div class="callout-icon">📦</div>
+      <div class="callout-body">
+        <strong>Spring Boot 3.3.5 — Spring Cloud 2023.0.3 — Maven</strong>
+        4 services: Auth :8081, Room :8082, Booking :8083, Payment :8084, Notification :8085. Mỗi service là 1 Maven project độc lập, đóng gói thành JAR chạy trong Docker container riêng.
+      </div>
+    </div>
+    <div style="overflow-x:auto;margin-bottom:32px">
+      <table class="compare" style="font-size:13px">
+        <tr><th style="width:220px">Dependency / Starter</th><th style="width:120px">Version</th><th>Vai trò &amp; Dùng ở đâu</th></tr>
+        <tr>
+          <td><strong>spring-boot-starter-web</strong></td><td>3.3.5</td>
+          <td>Nhúng Tomcat, expose REST API qua <code>@RestController</code>. Mọi service đều dùng để nhận HTTP request từ Nginx.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-boot-starter-security</strong></td><td>3.3.5 (Spring Security 6)</td>
+          <td>Bảo mật toàn service. Cấu hình <code>SecurityFilterChain</code>: request vào phải qua <code>JwtAuthFilter</code> → extract token → set <code>SecurityContext</code>. Hỗ trợ phân quyền <code>@PreAuthorize("hasRole('LANDLORD')")</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-boot-starter-data-jpa</strong></td><td>3.3.5 (Hibernate 6)</td>
+          <td>ORM layer. Map Java entity class ↔ bảng DB tự động. Dùng <code>JpaRepository</code> để CRUD, <code>@Query</code> cho câu truy vấn tuỳ chỉnh, <code>Specification</code> cho filter động (tìm phòng theo giá, quận, tiện ích...).</td>
+        </tr>
+        <tr>
+          <td><strong>mariadb-java-client</strong></td><td>3.x</td>
+          <td>JDBC driver kết nối MariaDB. Spring Data JPA dùng driver này để giao tiếp với DB. Không cần gọi JDBC trực tiếp.</td>
+        </tr>
+        <tr>
+          <td><strong>JJWT (io.jsonwebtoken)</strong></td><td>0.12.3</td>
+          <td>Tạo và xác minh JWT. <code>Jwts.builder()</code> tạo accessToken/refreshToken có chữ ký HMAC-SHA256. <code>Jwts.parserBuilder()</code> verify chữ ký và parse claims (userId, role). Dùng trong Auth Service và mọi service cần xác thực.</td>
+        </tr>
+        <tr>
+          <td><strong>BCryptPasswordEncoder</strong></td><td>(Spring Security built-in)</td>
+          <td>Hash mật khẩu trước khi lưu DB bằng thuật toán BCrypt (adaptive — tăng cost factor khi CPU mạnh hơn). Verify bằng <code>passwordEncoder.matches(raw, hashed)</code>. Ngay cả admin cũng không đọc được mật khẩu gốc.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-boot-starter-mail</strong></td><td>3.3.5 (JavaMail)</td>
+          <td>Gửi email qua SMTP (Gmail). Dùng trong Auth Service gửi OTP xác thực đăng ký; Notification Service gửi email thông báo đặt lịch/xác nhận cho chủ nhà và sinh viên.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-boot-starter-amqp</strong></td><td>3.3.5 (Spring AMQP)</td>
+          <td>Kết nối RabbitMQ. <code>RabbitTemplate.convertAndSend()</code> để publish event; <code>@RabbitListener</code> để consume message. Cấu hình <code>Jackson2JsonMessageConverter</code> để serialize/deserialize JSON tự động.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-cloud-starter-openfeign</strong></td><td>Spring Cloud 2023.0.3</td>
+          <td>Declarative HTTP client giữa các service. Chỉ cần viết interface với <code>@FeignClient</code> + <code>@GetMapping</code> — không cần code HTTP thủ công. Booking gọi Room/Auth, Payment gọi Booking/Room.</td>
+        </tr>
+        <tr>
+          <td><strong>resilience4j-spring-boot3</strong></td><td>2.2.0</td>
+          <td>Circuit Breaker bảo vệ Feign calls. Khi Room Service down, Booking Service tự động ngắt gọi, trả fallback response thay vì timeout. Cần thêm <code>spring-boot-starter-aop</code> để AOP hoạt động.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-boot-starter-validation</strong></td><td>3.3.5 (Jakarta Validation 3)</td>
+          <td>Validate request body tự động qua annotation: <code>@NotBlank</code>, <code>@Email</code>, <code>@Min</code>, <code>@Size</code>... Kết hợp <code>@Valid</code> trên <code>@RequestBody</code> trong controller.</td>
+        </tr>
+        <tr>
+          <td><strong>Lombok</strong></td><td>1.18+</td>
+          <td>Giảm boilerplate. <code>@Data</code> tự sinh getter/setter/toString/equals, <code>@Builder</code> sinh builder pattern, <code>@RequiredArgsConstructor</code> sinh constructor inject. Không ảnh hưởng runtime — chỉ hoạt động lúc compile.</td>
+        </tr>
+        <tr>
+          <td><strong>Jackson (FasterXML)</strong></td><td>(Spring Boot built-in)</td>
+          <td>Serialize/deserialize JSON tự động. <code>@JsonProperty("isRead")</code> để override tên field JSON. <code>@JsonIgnore</code> để ẩn field nhạy cảm (password) khỏi response.</td>
+        </tr>
+        <tr>
+          <td><strong>springdoc-openapi-starter-webmvc-ui</strong></td><td>2.6.0</td>
+          <td>Tự động sinh tài liệu API (Swagger UI) tại <code>/swagger-ui.html</code>. Đọc annotation <code>@RestController</code>, <code>@Operation</code> rồi render thành giao diện web cho tester.</td>
+        </tr>
+        <tr>
+          <td><strong>spring-boot-starter-actuator</strong></td><td>3.3.5</td>
+          <td>Endpoint health check <code>/actuator/health</code> — Docker health check dùng endpoint này để biết container đã sẵn sàng nhận request chưa.</td>
+        </tr>
+        <tr>
+          <td><strong>AWS SDK v2 — S3</strong></td><td>2.25.16</td>
+          <td>Upload ảnh phòng lên Amazon S3. Dùng <code>S3Client.putObject()</code> và tạo pre-signed URL để client truy cập ảnh trực tiếp từ S3.</td>
+        </tr>
+        <tr>
+          <td><strong>HMAC-SHA512 (VNPay)</strong></td><td>(Java built-in)</td>
+          <td>Tạo chữ ký cho URL thanh toán VNPay bằng <code>Mac.getInstance("HmacSHA512")</code>. VNPay dùng cùng khóa bí mật để verify chữ ký trên IPN callback — đảm bảo callback không bị giả mạo.</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ── BACKEND NODE.JS ── -->
+    <h3 style="font-size:18px;font-weight:800;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span style="background:#f7fee7;color:#3f6212;padding:4px 12px;border-radius:8px;font-size:13px">🟩 Backend — Node.js (ESM)</span>
+    </h3>
+    <div class="callout green" style="margin-bottom:16px">
+      <div class="callout-icon">📦</div>
+      <div class="callout-body">
+        <strong>2 services: Messaging Service :3001 + AI Chat Service :3002</strong>
+        Viết bằng JavaScript ESM (<code>import/export</code>). Messaging Service xử lý WebSocket chat và push notification real-time. AI Chat Service proxy streaming từ Claude API (Anthropic) về frontend.
+      </div>
+    </div>
+    <div style="overflow-x:auto;margin-bottom:32px">
+      <table class="compare" style="font-size:13px">
+        <tr><th style="width:200px">Package</th><th style="width:100px">Version</th><th>Vai trò &amp; Dùng ở đâu</th></tr>
+        <tr>
+          <td><strong>Express.js</strong></td><td>4.18</td>
+          <td>HTTP server framework. Định nghĩa REST route (<code>GET /api/messages</code>, <code>POST /api/messages/send</code>). Middleware pipeline: cors → json parser → jwt middleware → route handler → error handler.</td>
+        </tr>
+        <tr>
+          <td><strong>Socket.IO (server)</strong></td><td>4.6</td>
+          <td>WebSocket server gắn vào Express HTTP server. Client join room theo userId (<code>socket.join('user_5')</code>). Server push event <code>notification</code> / <code>new_message</code> tới đúng room khi có event từ RabbitMQ hoặc người dùng khác nhắn tin.</td>
+        </tr>
+        <tr>
+          <td><strong>Mongoose</strong></td><td>8.0</td>
+          <td>ODM (Object Document Mapper) cho MongoDB. Định nghĩa Schema (<code>ConversationSchema</code>, <code>MessageSchema</code>), tự động validate và convert kiểu dữ liệu. Query bằng method như <code>Message.find({ conversationId }).sort({ createdAt: -1 })</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>amqplib</strong></td><td>0.10.4</td>
+          <td>AMQP 0-9-1 client cho RabbitMQ. Dùng trong Messaging Service để consume queue <code>saf.socket.queue</code>, nhận booking event từ Spring Boot rồi emit socket tới user đang online. Có logic retry tự động khi RabbitMQ chưa khởi động xong.</td>
+        </tr>
+        <tr>
+          <td><strong>jsonwebtoken</strong></td><td>9.0</td>
+          <td>Verify JWT trong middleware (<code>jwt.verify(token, secret)</code>). Node.js services không tạo JWT — chỉ xác minh token do Auth Service (Spring Boot) phát hành, dùng cùng secret key.</td>
+        </tr>
+        <tr>
+          <td><strong>axios</strong></td><td>1.6</td>
+          <td>HTTP client — dùng để gọi Spring Boot Auth Service từ Node.js nếu cần lấy thông tin user từ token.</td>
+        </tr>
+        <tr>
+          <td><strong>cors</strong></td><td>2.8</td>
+          <td>Middleware xử lý Cross-Origin Resource Sharing. Cho phép frontend (chạy ở domain khác) gọi API. Cấu hình <code>origin: (origin, callback) =&gt; callback(null, true)</code> — chấp nhận mọi origin (phù hợp cho dev).</td>
+        </tr>
+        <tr>
+          <td><strong>dotenv</strong></td><td>16.3</td>
+          <td>Load biến môi trường từ file <code>.env</code> vào <code>process.env</code>. Tránh hardcode secrets (MONGODB_URI, RABBITMQ_URI, JWT_SECRET) trong code.</td>
+        </tr>
+        <tr>
+          <td><strong>@anthropic-ai/sdk</strong></td><td>latest</td>
+          <td>SDK chính thức của Anthropic. AI Chat Service dùng <code>client.messages.stream()</code> để gọi Claude API và stream từng token về frontend qua Server-Sent Events (SSE) — người dùng thấy chữ hiện dần như ChatGPT.</td>
+        </tr>
+        <tr>
+          <td><strong>nodemon</strong></td><td>3.0 (devDep)</td>
+          <td>Dev hot reload — tự restart Node.js server khi file thay đổi. Chỉ dùng trong development, production dùng <code>node src/server.js</code> trực tiếp.</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ── INFRASTRUCTURE ── -->
+    <h3 style="font-size:18px;font-weight:800;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span style="background:#1f2937;color:#e2e8f0;padding:4px 12px;border-radius:8px;font-size:13px">🐳 Infrastructure &amp; DevOps</span>
+    </h3>
+    <div style="overflow-x:auto;margin-bottom:16px">
+      <table class="compare" style="font-size:13px">
+        <tr><th style="width:200px">Công nghệ</th><th style="width:100px">Version</th><th>Vai trò</th></tr>
+        <tr>
+          <td><strong>Docker + Docker Compose</strong></td><td>24+ / v2</td>
+          <td>Containerize toàn bộ hệ thống. Mỗi service, DB, broker là 1 container riêng. <code>docker compose up</code> khởi động 12 containers cùng lúc theo thứ tự <code>depends_on</code>. Mạng nội bộ <code>saf-network</code> cho phép các container gọi nhau qua tên (<code>auth-service:8081</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>Nginx</strong></td><td>1.25 Alpine</td>
+          <td>API Gateway &amp; reverse proxy. Nhận toàn bộ traffic tại port 80. Định tuyến theo URL prefix đến đúng service nội bộ. Serve static files React (HTML/JS/CSS). Cấu hình WebSocket upgrade header cho Socket.IO.</td>
+        </tr>
+        <tr>
+          <td><strong>RabbitMQ</strong></td><td>3.12 Management</td>
+          <td>Message broker dùng AMQP protocol. Exchange <code>saf.booking</code> kiểu <b>Topic</b> — routing key <code>booking.#</code> match mọi event. 2 queue độc lập: <code>saf.notification.queue</code> (Spring) &amp; <code>saf.socket.queue</code> (Node.js). Management UI tại port 15672.</td>
+        </tr>
+        <tr>
+          <td><strong>MariaDB</strong></td><td>10.11 LTS</td>
+          <td>5 database instance riêng biệt (auth, room, booking, payment, notification). MySQL-compatible — Spring Data JPA + Hibernate dùng MariaDB dialect. Schema tự động tạo qua <code>spring.jpa.hibernate.ddl-auto=update</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>MongoDB</strong></td><td>7.0</td>
+          <td>Document database cho tin nhắn chat. Schema-less phù hợp với dữ liệu tin nhắn đa dạng. Mongoose ODM quản lý collection <code>conversations</code> và <code>messages</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Nominatim (OpenStreetMap)</strong></td><td>Public API</td>
+          <td>Geocoding miễn phí. Convert địa chỉ văn bản → tọa độ (forward geocoding) và tọa độ → địa chỉ (reverse geocoding). Dùng khi user gõ địa chỉ phòng hoặc click trên bản đồ Leaflet.</td>
+        </tr>
+        <tr>
+          <td><strong>VNPay</strong></td><td>Sandbox/Prod API</td>
+          <td>Cổng thanh toán nội địa Việt Nam. Hỗ trợ ATM, Internet Banking, QR Code. Luồng: tạo URL thanh toán có chữ ký → redirect user → VNPay gửi IPN callback → verify chữ ký → cập nhật DB.</td>
+        </tr>
+        <tr>
+          <td><strong>Claude API (Anthropic)</strong></td><td>claude-haiku-4-5</td>
+          <td>AI model xử lý câu hỏi tư vấn tìm phòng. Dùng streaming API — text trả về từng token, frontend hiển thị dần giống ChatGPT. Model Haiku được chọn vì nhanh và rẻ, phù hợp chatbot.</td>
+        </tr>
+        <tr>
+          <td><strong>Amazon S3</strong></td><td>AWS SDK v2</td>
+          <td>Lưu trữ ảnh phòng. Khi chủ nhà upload ảnh → Spring Boot đọc <code>MultipartFile</code> → upload lên S3 qua AWS SDK → lưu URL S3 vào DB. Client load ảnh trực tiếp từ S3 (không qua backend).</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ ARCHITECTURE -->
+<section id="arch">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">🏗 Kiến trúc</div>
+      <h2 class="sec-title">Sơ đồ kiến trúc toàn hệ thống</h2>
+      <p class="sec-sub">Nhìn từ trên xuống: từ browser của người dùng vào đến tận database</p>
+    </div>
+
+    <div class="arch-wrap">
+      <div class="arch-label-row"><span class="arch-label">NGƯỜI DÙNG (CLIENT)</span></div>
+      <div class="arch-row">
+        <div class="anode an-client">⚛️ Web App (React) — localhost</div>
+        <div class="anode an-client">📱 Mobile App (React Native)</div>
+      </div>
+
+      <div class="arch-sep">↕ HTTP / WebSocket ↕</div>
+
+      <div class="arch-label-row"><span class="arch-label">API GATEWAY — CỔNG DUY NHẤT (PORT 80)</span></div>
+      <div class="arch-row">
+        <div class="anode an-gw" style="font-size:13px">🌐 Nginx — nhận TẤT CẢ request, phân loại theo URL và chuyển đến đúng service nội bộ</div>
+      </div>
+
+      <div class="arch-sep">↕ HTTP nội bộ (Docker network) ↕</div>
+
+      <div class="arch-label-row"><span class="arch-label">MICROSERVICES (BÊN TRONG DOCKER — KHÔNG LỘ RA NGOÀI)</span></div>
+      <div class="arch-row">
+        <div class="anode an-spring">🔐 Auth :8081</div>
+        <div class="anode an-spring">🏠 Room :8082</div>
+        <div class="anode an-spring">📅 Booking :8083</div>
+        <div class="anode an-spring">💳 Payment :8084</div>
+        <div class="anode an-spring">🔔 Notification :8085</div>
+        <div class="anode an-node">💬 Messaging :3001</div>
+        <div class="anode an-node">🤖 AI Chat :3002</div>
+      </div>
+
+      <div class="arch-sep">↕ Publish / Subscribe (AMQP) ↕</div>
+
+      <div class="arch-label-row"><span class="arch-label">MESSAGE BROKER — TRUNG GIAN TRUYỀN SỰ KIỆN</span></div>
+      <div class="arch-row">
+        <div class="anode an-mq" style="max-width:600px;text-align:center">
+          🐇 RabbitMQ — Exchange: <b>saf.booking</b> (Topic)<br>
+          <span style="font-size:11px;opacity:.7">
+            saf.notification.queue → Notification Service &nbsp;|&nbsp; saf.socket.queue → Messaging Service
+          </span>
+        </div>
+      </div>
+
+      <div class="arch-sep">↕ SQL / NoSQL ↕</div>
+
+      <div class="arch-label-row"><span class="arch-label">DATA LAYER — MỖI SERVICE CÓ DATABASE RIÊNG</span></div>
+      <div class="arch-row">
+        <div class="anode an-db-m">🐬 auth_db</div>
+        <div class="anode an-db-m">🐬 room_db</div>
+        <div class="anode an-db-m">🐬 booking_db</div>
+        <div class="anode an-db-m">🐬 payment_db</div>
+        <div class="anode an-db-m">🐬 notification_db</div>
+        <div class="anode an-db-n">🍃 MongoDB</div>
+      </div>
+    </div>
+
+    <div class="analogy" style="margin-top:24px">
+      <div class="analogy-title">🏪 Tại sao mỗi service cần DB riêng?</div>
+      <div class="analogy-body">
+        Hình dung như các cửa hàng trong trung tâm thương mại — mỗi cửa hàng tự quản lý kho hàng của mình, không được tự ý vào kho của cửa hàng khác. Muốn biết thông tin của nhau thì phải <b>hỏi qua quầy lễ tân</b> (API call).
+        <ul>
+          <li>✅ Nếu DB của Room Service hỏng → các service khác vẫn chạy bình thường</li>
+          <li>✅ Có thể nâng cấp riêng từng DB mà không ảnh hưởng hệ thống</li>
+          <li>✅ Bảo mật tốt hơn — Notification Service không biết mật khẩu của auth_db</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ SERVICES -->
+<section id="services">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">⚙️ Microservices</div>
+      <h2 class="sec-title">Chi tiết từng service</h2>
+      <p class="sec-sub">Nhiệm vụ, công nghệ, và các endpoint chính của mỗi service</p>
+    </div>
+    <div class="svc-grid">
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#eff6ff">
+          <div class="svc-ico" style="background:#dbeafe">🔐</div>
+          <div><div class="svc-title">Auth Service</div><div class="svc-meta">Spring Boot · Port 8081 · MariaDB auth_db</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Xác thực người dùng. Cấp "thẻ ra vào" (JWT token) sau khi đăng nhập. Quản lý hồ sơ, OTP qua email, phân quyền STUDENT / LANDLORD / ADMIN.</p>
+          <div class="svc-tags"><span class="tag">Spring Security</span><span class="tag">JJWT 0.12.3</span><span class="tag">BCrypt</span><span class="tag">JavaMail OTP</span></div>
+          <ul class="ep-list">
+            <li><span class="mt post">POST</span>/api/auth/login — đăng nhập, trả JWT</li>
+            <li><span class="mt post">POST</span>/api/auth/register — tạo tài khoản</li>
+            <li><span class="mt post">POST</span>/api/auth/refresh — làm mới token</li>
+            <li><span class="mt get">GET</span> /api/users/me — lấy thông tin bản thân</li>
+            <li><span class="mt get">GET</span> /api/internal/users/{id} — dùng nội bộ</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#f0fdf4">
+          <div class="svc-ico" style="background:#dcfce7">🏠</div>
+          <div><div class="svc-title">Room Service</div><div class="svc-meta">Spring Boot · Port 8082 · MariaDB room_db</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Quản lý toàn bộ thông tin phòng trọ: đăng tin, tìm kiếm với bộ lọc đa tiêu chí, upload ảnh, đánh giá, lưu yêu thích, cập nhật trạng thái.</p>
+          <div class="svc-tags"><span class="tag">JPA Specifications</span><span class="tag">Multipart Upload</span><span class="tag">Enums AmenityType</span></div>
+          <ul class="ep-list">
+            <li><span class="mt get">GET</span> /api/rooms — tìm kiếm &amp; lọc</li>
+            <li><span class="mt post">POST</span>/api/rooms — đăng phòng mới</li>
+            <li><span class="mt put">PUT</span> /api/rooms/{id} — cập nhật phòng</li>
+            <li><span class="mt post">POST</span>/api/reviews/{roomId} — đánh giá</li>
+            <li><span class="mt post">POST</span>/api/favorites/{roomId} — lưu yêu thích</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#fff7ed">
+          <div class="svc-ico" style="background:#fed7aa">📅</div>
+          <div><div class="svc-title">Booking Service</div><div class="svc-meta">Spring Boot · Port 8083 · MariaDB booking_db</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Xử lý toàn bộ vòng đời lịch hẹn: tạo → xác nhận → hoàn thành / từ chối / huỷ. Sau mỗi thay đổi trạng thái, tự động publish event lên RabbitMQ.</p>
+          <div class="svc-tags"><span class="tag">RabbitMQ Publisher</span><span class="tag">OpenFeign → Auth &amp; Room</span><span class="tag">Resilience4j CB</span></div>
+          <ul class="ep-list">
+            <li><span class="mt post">POST</span>/api/bookings — tạo lịch hẹn mới</li>
+            <li><span class="mt get">GET</span> /api/bookings/my — lịch của sinh viên</li>
+            <li><span class="mt get">GET</span> /api/bookings/incoming — lịch vào của chủ nhà</li>
+            <li><span class="mt patch">PATCH</span>/api/bookings/{id}/status — đổi trạng thái</li>
+            <li><span class="mt get">GET</span> /api/stats/landlord — thống kê chủ nhà</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#faf5ff">
+          <div class="svc-ico" style="background:#e9d5ff">💳</div>
+          <div><div class="svc-title">Payment Service</div><div class="svc-meta">Spring Boot · Port 8084 · MariaDB payment_db</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Tích hợp VNPay: tạo URL thanh toán có chữ ký (HMAC-SHA512), nhận callback IPN từ VNPay, xác minh chữ ký, cập nhật trạng thái. Sau khi thành công thì cập nhật booking &amp; phòng qua Feign.</p>
+          <div class="svc-tags"><span class="tag">VNPay IPN/Return</span><span class="tag">HMAC-SHA512</span><span class="tag">OpenFeign</span><span class="tag">RabbitMQ</span></div>
+          <ul class="ep-list">
+            <li><span class="mt post">POST</span>/api/payments/create — tạo URL thanh toán</li>
+            <li><span class="mt get">GET</span> /api/payments/vnpay-ipn — VNPay callback</li>
+            <li><span class="mt get">GET</span> /api/payments/history — lịch sử thanh toán</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#fdf2f8">
+          <div class="svc-ico" style="background:#fbcfe8">🔔</div>
+          <div><div class="svc-title">Notification Service</div><div class="svc-meta">Spring Boot · Port 8085 · MariaDB notification_db</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Lắng nghe sự kiện từ RabbitMQ (có queue riêng), lưu thông báo vào DB, gửi email. Cung cấp REST API cho frontend poll lấy danh sách thông báo &amp; đánh dấu đã đọc.</p>
+          <div class="svc-tags"><span class="tag">RabbitMQ Consumer</span><span class="tag">JavaMail</span><span class="tag">JWT Auth</span><span class="tag">JPA + MariaDB</span></div>
+          <ul class="ep-list">
+            <li><span class="mt get">GET</span> /api/notifications/my — danh sách thông báo</li>
+            <li><span class="mt get">GET</span> /api/notifications/unread-count</li>
+            <li><span class="mt patch">PATCH</span>/api/notifications/read-all — đánh dấu đọc</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#ecfeff">
+          <div class="svc-ico" style="background:#a5f3fc">💬</div>
+          <div><div class="svc-title">Messaging Service</div><div class="svc-meta">Node.js + Socket.IO · Port 3001 · MongoDB</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Chat real-time qua WebSocket (Socket.IO). Lưu lịch sử tin nhắn vào MongoDB. Đồng thời có queue RabbitMQ riêng để push thông báo booking real-time tới user đang online.</p>
+          <div class="svc-tags"><span class="tag">Socket.IO</span><span class="tag">Express.js</span><span class="tag">Mongoose</span><span class="tag">amqplib</span></div>
+          <ul class="ep-list">
+            <li><span class="mt get">GET</span> /api/messages/{conversationId}</li>
+            <li><span class="mt post">POST</span>/api/messages/send</li>
+            <li><span class="mt ws">WS</span>  /socket.io — kênh real-time</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-head" style="background:#eef2ff">
+          <div class="svc-ico" style="background:#c7d2fe">🤖</div>
+          <div><div class="svc-title">AI Chat Service</div><div class="svc-meta">Node.js · Port 3002</div></div>
+        </div>
+        <div class="svc-body">
+          <p class="svc-why">📌 <b>Làm gì?</b> Chatbot AI hỗ trợ người dùng tìm phòng, giải đáp thắc mắc. Gọi Claude API (Anthropic) và stream kết quả về frontend theo từng chunk (Server-Sent Events).</p>
+          <div class="svc-tags"><span class="tag">Claude API (Anthropic)</span><span class="tag">SSE Streaming</span><span class="tag">Express.js</span></div>
+          <ul class="ep-list">
+            <li><span class="mt post">POST</span>/api/ai-chat/message — streaming response</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FLOWS -->
+<section id="flows">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">🔄 Luồng hoạt động</div>
+      <h2 class="sec-title">Dữ liệu chạy như thế nào trong hệ thống?</h2>
+      <p class="sec-sub">Từng bước từ lúc người dùng bấm nút đến khi hệ thống xử lý xong</p>
+    </div>
+    <div class="flow-grid">
+
+      <div class="flow-card">
+        <div class="flow-head" style="background:var(--blue-light)">🔐 Luồng đăng nhập (JWT)</div>
+        <div class="flow-body">
+          <ul class="flow-steps">
+            <li>Người dùng nhập SĐT + mật khẩu → bấm Đăng nhập</li>
+            <li>Frontend gửi <code>POST /api/auth/login</code> đến Nginx → Auth Service</li>
+            <li>Auth Service kiểm tra mật khẩu (BCrypt), nếu đúng → tạo 2 token: <b>accessToken</b> (sống 15 phút) và <b>refreshToken</b> (sống 7 ngày)</li>
+            <li>Frontend lưu cả 2 vào <b>sessionStorage</b> của trình duyệt</li>
+            <li>Mọi request tiếp theo đính kèm header: <code>Authorization: Bearer {accessToken}</code></li>
+            <li>Khi accessToken hết hạn → server trả 401 → axios interceptor tự động gọi <code>POST /api/auth/refresh</code> lấy token mới → thử lại request cũ</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <div class="flow-head" style="background:var(--orange-light)">📅 Luồng đặt lịch xem phòng</div>
+        <div class="flow-body">
+          <ul class="flow-steps">
+            <li>Sinh viên chọn phòng, chọn ngày giờ → bấm "Đặt lịch"</li>
+            <li>Booking Service nhận request, gọi Room Service (Feign) kiểm tra phòng còn trống</li>
+            <li>Tạo booking với trạng thái <b>PENDING</b>, lưu vào booking_db</li>
+            <li>Booking Service publish event <code>NEW_BOOKING</code> lên RabbitMQ exchange <code>saf.booking</code></li>
+            <li>RabbitMQ fan-out tới 2 queues: Notification Service lưu DB + gửi email chủ nhà; Messaging Service push socket real-time cho chủ nhà đang online</li>
+            <li>Chủ nhà xác nhận → trạng thái thành <b>CONFIRMED</b> → event <code>BOOKING_CONFIRMED</code> → sinh viên nhận thông báo</li>
+            <li>Sau buổi xem → Admin/chủ nhà đổi thành <b>COMPLETED</b> → sinh viên được đánh giá phòng</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <div class="flow-head" style="background:var(--purple-light)">💳 Luồng thanh toán VNPay</div>
+        <div class="flow-body">
+          <ul class="flow-steps">
+            <li>Sinh viên bấm "Thanh toán đặt cọc" → gọi <code>POST /api/payments/create</code></li>
+            <li>Payment Service tạo URL VNPay với chữ ký HMAC-SHA512 (đảm bảo không bị giả mạo)</li>
+            <li>Trình duyệt redirect sang trang thanh toán của VNPay</li>
+            <li>Người dùng hoàn tất thanh toán trên cổng VNPay (ATM, QR Code...)</li>
+            <li>VNPay gọi callback IPN về <code>GET /api/payments/vnpay-ipn</code></li>
+            <li>Payment Service xác minh chữ ký → cập nhật payment → SUCCESS</li>
+            <li>Gọi Booking Service cập nhật booking → RENTED; gọi Room Service → phòng thành RENTED</li>
+            <li>Publish <code>PAYMENT_SUCCESS</code> → cả sinh viên &amp; chủ nhà đều nhận thông báo + email</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <div class="flow-head" style="background:var(--pink-light)">🔔 Luồng thông báo in-app</div>
+        <div class="flow-body">
+          <ul class="flow-steps">
+            <li>Booking / Payment Service publish event lên RabbitMQ (đây là "tin nhắn" giữa các service)</li>
+            <li>RabbitMQ có <b>2 queue độc lập</b>: mỗi queue là "hộp thư" riêng, cả 2 đều nhận đủ mọi message</li>
+            <li><code>saf.notification.queue</code> → Notification Service: lưu vào notification_db + gửi email</li>
+            <li><code>saf.socket.queue</code> → Messaging Service: nếu user đang online → push socket event ngay lập tức</li>
+            <li>Frontend <b>polling mỗi 30 giây</b>: gọi <code>GET /api/notifications/my</code> để cập nhật danh sách thông báo</li>
+            <li>Người dùng mở chuông 🔔 → <code>PATCH /api/notifications/read-all</code> → dot đỏ biến mất, DB cập nhật <code>is_read = 1</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <div class="flow-head" style="background:var(--cyan-light)">💬 Luồng chat real-time</div>
+        <div class="flow-body">
+          <ul class="flow-steps">
+            <li>Sau khi đăng nhập, frontend tự động kết nối WebSocket tới <code>/socket.io</code></li>
+            <li>Client join "phòng" socket riêng: <code>user_5</code>, <code>user_2</code>... (theo userId)</li>
+            <li>Sinh viên nhắn tin → emit socket event <code>send_message</code></li>
+            <li>Messaging Service nhận, lưu vào MongoDB collection <code>messages</code></li>
+            <li>Emit event <code>new_message</code> tới phòng socket của người nhận</li>
+            <li>Người nhận nhận tin <b>ngay lập tức</b> mà không cần reload trang (WebSocket duy trì kết nối liên tục)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <div class="flow-head" style="background:var(--green-light)">🔗 Giao tiếp giữa các service</div>
+        <div class="flow-body">
+          <ul class="flow-steps">
+            <li><b>Đồng bộ (REST qua OpenFeign):</b> khi cần kết quả ngay — Booking hỏi Room "phòng này có trống không?", Payment hỏi Booking "booking này có tồn tại không?"</li>
+            <li><b>Bất đồng bộ (RabbitMQ):</b> khi không cần chờ — Booking tạo xong lịch hẹn rồi "ném" event vào queue, không cần đợi Notification gửi email xong</li>
+            <li>Circuit Breaker (Resilience4j): nếu Room Service đang chết → Booking Service không bị treo theo, tự động chuyển sang fallback</li>
+            <li>Tất cả services trong cùng Docker network <code>saf-network</code>, gọi nhau qua tên container thay vì IP</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ DB -->
+<section id="db">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">🗄 Database</div>
+      <h2 class="sec-title">Database của từng service</h2>
+      <p class="sec-sub">Database-per-Service pattern — nguyên tắc cơ bản của Microservices</p>
+    </div>
+    <div class="db-grid">
+      <div class="db-card">
+        <div class="db-head"><div class="db-ico">🐬</div><div><div class="db-name">auth_db</div><div class="db-type">MariaDB · Auth Service</div></div></div>
+        <ul class="db-tables">
+          <li>users — thông tin tài khoản</li>
+          <li>refresh_tokens — token làm mới JWT</li>
+          <li>otps — mã OTP xác thực email</li>
+        </ul>
+      </div>
+      <div class="db-card">
+        <div class="db-head"><div class="db-ico">🐬</div><div><div class="db-name">room_db</div><div class="db-type">MariaDB · Room Service</div></div></div>
+        <ul class="db-tables">
+          <li>rooms — thông tin phòng trọ</li>
+          <li>room_images — ảnh của phòng</li>
+          <li>room_amenities — tiện ích phòng</li>
+          <li>reviews — đánh giá của sinh viên</li>
+          <li>favorites — phòng đã lưu</li>
+        </ul>
+      </div>
+      <div class="db-card">
+        <div class="db-head"><div class="db-ico">🐬</div><div><div class="db-name">booking_db</div><div class="db-type">MariaDB · Booking Service</div></div></div>
+        <ul class="db-tables">
+          <li>bookings — lịch hẹn xem phòng</li>
+        </ul>
+      </div>
+      <div class="db-card">
+        <div class="db-head"><div class="db-ico">🐬</div><div><div class="db-name">payment_db</div><div class="db-type">MariaDB · Payment Service</div></div></div>
+        <ul class="db-tables">
+          <li>payments — giao dịch thanh toán</li>
+        </ul>
+      </div>
+      <div class="db-card">
+        <div class="db-head"><div class="db-ico">🐬</div><div><div class="db-name">notification_db</div><div class="db-type">MariaDB · Notification Service</div></div></div>
+        <ul class="db-tables">
+          <li>notifications — thông báo in-app</li>
+        </ul>
+      </div>
+      <div class="db-card">
+        <div class="db-head"><div class="db-ico">🍃</div><div><div class="db-name">messages</div><div class="db-type">MongoDB · Messaging Service</div></div></div>
+        <ul class="db-tables">
+          <li>conversations — cuộc trò chuyện</li>
+          <li>messages — nội dung tin nhắn</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout yellow" style="margin-top:24px">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <strong>Tại sao chat dùng MongoDB thay vì MariaDB?</strong>
+        Tin nhắn chat không có schema cố định (có thể là text, ảnh, file...), số lượng ghi rất cao và cần tra cứu nhanh theo conversation. MongoDB phù hợp hơn cho dữ liệu dạng document, đặc biệt khi không cần JOIN phức tạp. MariaDB được dùng cho dữ liệu có quan hệ chặt (user, booking, payment) cần transaction và foreign key.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ Q&A -->
+<section id="qa">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-badge">❓ Hỏi đáp</div>
+      <h2 class="sec-title">Câu hỏi thầy cô thường hỏi</h2>
+      <p class="sec-sub">Các câu hỏi phổ biến trong buổi bảo vệ đồ án — kèm câu trả lời đầy đủ</p>
+    </div>
+
+    <div class="qa-grid">
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Tại sao chọn kiến trúc Microservices thay vì Monolithic (một khối)?</span>
+          <span class="qa-q-badge badge-arch">Kiến trúc</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Monolithic</strong> là toàn bộ code chạy trong 1 ứng dụng duy nhất. <strong>Microservices</strong> chia nhỏ thành nhiều service độc lập.</p>
+          <p>Lý do chọn Microservices:</p>
+          <ul>
+            <li><strong>Độc lập triển khai:</strong> Cập nhật Notification Service không cần dừng toàn hệ thống</li>
+            <li><strong>Fault isolation:</strong> Payment Service lỗi, các service khác vẫn chạy — sinh viên vẫn xem phòng được</li>
+            <li><strong>Polyglot:</strong> Chọn ngôn ngữ phù hợp — Node.js cho real-time, Java cho business logic</li>
+            <li><strong>Scale độc lập:</strong> Nếu lượng đặt phòng tăng mạnh, chỉ cần scale Booking Service</li>
+          </ul>
+          <p><strong>Nhược điểm thừa nhận:</strong> Phức tạp hơn Monolithic, cần quản lý nhiều service, giao tiếp qua mạng chậm hơn gọi trong process.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>JWT là gì? Tại sao không dùng Session truyền thống?</span>
+          <span class="qa-q-badge badge-sec">Bảo mật</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>JWT (JSON Web Token)</strong> là một chuỗi mã hóa chứa thông tin người dùng (userId, role, thời hạn). Giống như <i>chứng minh thư</i> — mang theo người, tự xác minh được mà không cần hỏi trung tâm.</p>
+          <p><strong>Session</strong> truyền thống: server lưu thông tin đăng nhập trong bộ nhớ/DB, client chỉ giữ ID session. Mỗi request phải hỏi server "ID này còn hợp lệ không?"</p>
+          <table class="compare">
+            <tr><th>Tiêu chí</th><th>JWT (Stateless)</th><th>Session (Stateful)</th></tr>
+            <tr><td>Lưu trữ phía server</td><td class="check">✓ Không cần</td><td class="cross">✗ Phải lưu session store</td></tr>
+            <tr><td>Scale nhiều server</td><td class="check">✓ Dễ dàng</td><td class="cross">✗ Cần session share</td></tr>
+            <tr><td>Phù hợp Microservices</td><td class="check">✓ Mỗi service tự verify</td><td class="cross">✗ Mọi service phải gọi Auth</td></tr>
+            <tr><td>Thu hồi token ngay</td><td class="cross">✗ Phải đợi hết hạn</td><td class="check">✓ Xóa session là xong</td></tr>
+          </table>
+          <p>Hệ thống dùng <b>accessToken ngắn (15 phút)</b> + <b>refreshToken dài (7 ngày)</b> để cân bằng: bảo mật cao mà vẫn tiện lợi.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>RabbitMQ là gì? Tại sao không gọi Notification Service trực tiếp từ Booking Service?</span>
+          <span class="qa-q-badge badge-arch">Kiến trúc</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>RabbitMQ</strong> là message broker — trung gian nhận và chuyển tiếp message giữa các service. Giống như <i>hòm thư</i>: người gửi bỏ thư vào, không cần biết người nhận đang làm gì.</p>
+          <p><strong>Nếu gọi trực tiếp (REST):</strong></p>
+          <ul>
+            <li>Booking phải chờ Notification gửi email xong mới trả kết quả → chậm</li>
+            <li>Nếu Notification Service đang down → Booking cũng thất bại → mất đơn đặt phòng</li>
+            <li>Booking phải biết URL của Notification → coupling chặt</li>
+          </ul>
+          <p><strong>Dùng RabbitMQ:</strong></p>
+          <ul>
+            <li>Booking tạo xong lịch, ném event vào queue → trả kết quả ngay (nhanh)</li>
+            <li>Nếu Notification đang down → message nằm chờ trong queue, khi service phục hồi sẽ xử lý tiếp</li>
+            <li>Dễ thêm consumer mới (ví dụ SMS service) mà không sửa Booking</li>
+          </ul>
+          <p>Đây là pattern <b>Event-Driven Architecture</b> — loose coupling giữa các service.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Docker là gì? Tại sao dùng Docker thay vì cài thẳng lên máy?</span>
+          <span class="qa-q-badge badge-tech">Công nghệ</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Docker</strong> đóng gói ứng dụng cùng toàn bộ dependencies vào một "container" — giống như <i>hộp vận chuyển tiêu chuẩn</i>: chạy được trên bất kỳ máy nào có Docker, không cần cài Java, Node, MariaDB riêng.</p>
+          <ul>
+            <li><strong>Môi trường nhất quán:</strong> "Chạy được trên máy tôi" → chạy được ở mọi nơi</li>
+            <li><strong>Cô lập:</strong> 5 instance MariaDB với cấu hình khác nhau chạy song song không xung đột</li>
+            <li><strong>Docker Compose:</strong> 1 lệnh <code>docker compose up</code> khởi động toàn bộ 12 containers</li>
+            <li><strong>Dễ reset:</strong> Xóa container, tạo lại là sạch hoàn toàn</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>OpenFeign là gì? Tại sao không dùng RestTemplate hay HttpClient thông thường?</span>
+          <span class="qa-q-badge badge-tech">Công nghệ</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>OpenFeign</strong> là thư viện cho phép định nghĩa HTTP client bằng interface — chỉ cần viết interface với annotation, không cần code gọi HTTP thủ công.</p>
+          <p>Ví dụ thay vì viết:</p>
+          <code style="display:block;background:#f1f5f9;padding:12px;border-radius:8px;font-size:12px;margin:10px 0">
+            RestTemplate template = new RestTemplate();<br>
+            String url = "http://auth-service:8081/api/internal/users/" + id;<br>
+            ResponseEntity&lt;ApiResponse&gt; resp = template.getForEntity(url, ApiResponse.class);
+          </code>
+          <p>Dùng Feign chỉ cần:</p>
+          <code style="display:block;background:#f0fdf4;padding:12px;border-radius:8px;font-size:12px;margin:10px 0">
+            @FeignClient(url = "http://auth-service:8081")<br>
+            interface AuthClient {<br>
+            &nbsp;&nbsp;@GetMapping("/api/internal/users/{id}")<br>
+            &nbsp;&nbsp;ApiResponse getUserById(@PathVariable Long id);<br>
+            }
+          </code>
+          <p>Feign tự xử lý: tạo HTTP request, parse response, xử lý lỗi, tích hợp circuit breaker.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Circuit Breaker (Resilience4j) là gì? Dùng ở đâu trong dự án?</span>
+          <span class="qa-q-badge badge-arch">Kiến trúc</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Circuit Breaker</strong> (cầu dao điện) là pattern bảo vệ hệ thống khi một service phụ thuộc bị lỗi.</p>
+          <p>Hình dung: khi Room Service đang lỗi, nếu Booking cứ gọi vào → timeout liên tục → cả Booking cũng bị "kéo chết". Circuit Breaker sẽ:</p>
+          <ul>
+            <li><strong>Closed (bình thường):</strong> cho request đi qua</li>
+            <li><strong>Open (đã cắt):</strong> khi tỷ lệ lỗi > ngưỡng → ngừng gọi Room Service ngay, trả về fallback ngay lập tức</li>
+            <li><strong>Half-Open (thử lại):</strong> sau vài giây → thử 1 request → nếu thành công thì đóng lại</li>
+          </ul>
+          <p>Trong dự án: Booking Service có Circuit Breaker bảo vệ cuộc gọi tới Room Service và Auth Service qua Resilience4j.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>WebSocket khác gì HTTP thông thường? Tại sao cần Socket.IO?</span>
+          <span class="qa-q-badge badge-tech">Công nghệ</span>
+        </div>
+        <div class="qa-a">
+          <table class="compare">
+            <tr><th>Tiêu chí</th><th>HTTP Thường</th><th>WebSocket (Socket.IO)</th></tr>
+            <tr><td>Kết nối</td><td>Mở → gửi → đóng (mỗi request)</td><td>Mở 1 lần, duy trì liên tục</td></tr>
+            <tr><td>Chiều dữ liệu</td><td>Client hỏi → Server trả lời</td><td>2 chiều: server tự push được</td></tr>
+            <tr><td>Độ trễ</td><td>Cao (header overhead mỗi lần)</td><td>Thấp (kết nối sẵn có)</td></tr>
+            <tr><td>Dùng cho</td><td>Lấy dữ liệu, form submit</td><td>Chat, game, thông báo real-time</td></tr>
+          </table>
+          <p>Chat cần server chủ động gửi tin khi có người nhắn → phải dùng WebSocket. <strong>Socket.IO</strong> là thư viện phổ biến bọc WebSocket, tự động fallback về HTTP polling nếu browser không hỗ trợ WebSocket.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Hệ thống bảo mật như thế nào? Có những lỗ hổng nào cần lưu ý?</span>
+          <span class="qa-q-badge badge-sec">Bảo mật</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Các biện pháp bảo mật đã triển khai:</strong></p>
+          <ul>
+            <li><strong>JWT + HTTPS:</strong> Token hết hạn ngắn (15 phút), refreshToken được lưu an toàn</li>
+            <li><strong>BCrypt:</strong> Mật khẩu được hash trước khi lưu DB, không lưu mật khẩu thô</li>
+            <li><strong>Spring Security:</strong> Kiểm tra JWT trên mọi request tới các service</li>
+            <li><strong>CORS + CSRF:</strong> Chống tấn công cross-origin (stateless nên CSRF tắt hợp lệ)</li>
+            <li><strong>Internal endpoints:</strong> <code>/api/internal/*</code> chỉ accessible từ nội bộ Docker network</li>
+            <li><strong>VNPay HMAC-SHA512:</strong> Xác minh callback để chống giả mạo thanh toán</li>
+          </ul>
+          <p><strong>Điểm cần cải thiện thêm:</strong> Rate limiting, input sanitization kỹ hơn, HTTPS trong production, quản lý secrets (không hardcode).</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Nếu hệ thống cần xử lý 100,000 người dùng, scale như thế nào?</span>
+          <span class="qa-q-badge badge-scale">Scalability</span>
+        </div>
+        <div class="qa-a">
+          <p>Vì là Microservices, có thể scale <b>từng phần</b> mà không scale toàn bộ:</p>
+          <ul>
+            <li><strong>Scale Room Service:</strong> Nếu lượt xem phòng tăng → tăng instance Room Service lên 3, Nginx load balance</li>
+            <li><strong>Scale Booking Service:</strong> Mùa tựu trường → nhu cầu đặt lịch tăng → scale riêng</li>
+            <li><strong>RabbitMQ cluster:</strong> Tăng số consumer xử lý notification song song</li>
+            <li><strong>Database:</strong> Thêm read replica cho room_db để handle nhiều query đọc</li>
+            <li><strong>Cache:</strong> Thêm Redis cho các query phổ biến (tìm phòng, thông tin user)</li>
+          </ul>
+          <p>Đây là lợi thế lớn nhất của Microservices so với Monolithic — scale phẫu thuật thay vì scale cả khối.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Nginx đóng vai trò gì? Có thể bỏ Nginx đi không?</span>
+          <span class="qa-q-badge badge-arch">Kiến trúc</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Nginx đảm nhận nhiều vai trò cùng lúc:</strong></p>
+          <ul>
+            <li><strong>API Gateway:</strong> Điểm vào duy nhất, điều hướng request đến đúng service</li>
+            <li><strong>Static file server:</strong> Serve React frontend (HTML, JS, CSS) cực nhanh</li>
+            <li><strong>Reverse proxy:</strong> Ẩn các service nội bộ, client không biết port 8081, 8082...</li>
+            <li><strong>Load balancer:</strong> Nếu có nhiều instance của 1 service, Nginx chia đều request</li>
+            <li><strong>SSL termination:</strong> Xử lý HTTPS ở Nginx, các service nội bộ dùng HTTP thuần</li>
+          </ul>
+          <p><strong>Nếu bỏ Nginx:</strong> Frontend và backend phải expose trực tiếp ra ngoài → mất bảo mật, phải handle CORS, không có load balancing. Thực tế không thể thiếu trong production.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Tại sao thông báo dùng polling (30 giây) thay vì WebSocket luôn?</span>
+          <span class="qa-q-badge badge-design">Thiết kế</span>
+        </div>
+        <div class="qa-a">
+          <p>Thực ra hệ thống dùng <b>cả hai</b>:</p>
+          <ul>
+            <li><strong>WebSocket (real-time):</strong> Nếu user đang online → Messaging Service push ngay qua socket khi có booking event mới</li>
+            <li><strong>Polling (fallback):</strong> Nếu user vừa mở app sau một thời gian → poll để lấy tất cả thông báo bị miss trong lúc offline</li>
+          </ul>
+          <p>Polling mỗi 30 giây đảm bảo tính nhất quán — kể cả khi WebSocket bị mất kết nối, user vẫn nhận được thông báo trong vòng 30 giây. Đây là thiết kế <b>eventually consistent</b> — không cần real-time tuyệt đối cho thông báo (khác với chat cần ngay lập tức).</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>VNPay tích hợp như thế nào? IPN là gì?</span>
+          <span class="qa-q-badge badge-tech">Công nghệ</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Luồng VNPay:</strong></p>
+          <ul>
+            <li>App tạo URL thanh toán có chữ ký HMAC-SHA512 → redirect người dùng sang VNPay</li>
+            <li>VNPay gọi <strong>IPN (Instant Payment Notification)</strong> về server — đây là callback từ server VNPay → server SAF, không qua browser người dùng</li>
+            <li>Server SAF xác minh chữ ký IPN (tránh giả mạo), sau đó mới cập nhật DB</li>
+          </ul>
+          <p><strong>Tại sao cần IPN thay vì chỉ dùng return URL?</strong> Return URL là URL browser redirect sau khi thanh toán — người dùng có thể đóng tab hoặc thay đổi tham số. IPN là server-to-server, không phụ thuộc hành động của người dùng, đáng tin hơn để xác nhận thanh toán thành công.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Sự khác nhau giữa accessToken và refreshToken?</span>
+          <span class="qa-q-badge badge-sec">Bảo mật</span>
+        </div>
+        <div class="qa-a">
+          <table class="compare">
+            <tr><th>Tiêu chí</th><th>accessToken</th><th>refreshToken</th></tr>
+            <tr><td>Thời hạn</td><td>15 phút</td><td>7 ngày</td></tr>
+            <tr><td>Dùng để</td><td>Xác thực mỗi API request</td><td>Lấy accessToken mới khi hết hạn</td></tr>
+            <tr><td>Gửi đi</td><td>Mọi request (Authorization header)</td><td>Chỉ khi gọi /auth/refresh</td></tr>
+            <tr><td>Lưu ở đâu</td><td>sessionStorage</td><td>sessionStorage</td></tr>
+            <tr><td>Nếu lộ ra</td><td>Tấn công được 15 phút</td><td>Nguy hiểm hơn — phải bảo vệ kỹ</td></tr>
+          </table>
+          <p>Thiết kế này đảm bảo: nếu accessToken bị lộ thì thiệt hại ngắn (15 phút). User không phải đăng nhập lại mỗi 15 phút nhờ có refreshToken làm mới tự động.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Tại sao cần nhiều MariaDB instance thay vì 1 DB chung cho tất cả service?</span>
+          <span class="qa-q-badge badge-design">Thiết kế</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Nếu dùng 1 DB chung (anti-pattern):</strong></p>
+          <ul>
+            <li>Các service phụ thuộc nhau qua DB — đổi schema auth_db có thể làm hỏng Booking Service</li>
+            <li>Bottleneck: tất cả request đổ vào 1 DB → quá tải</li>
+            <li>Khó scale từng phần — phải scale toàn bộ DB dù chỉ 1 service bận</li>
+          </ul>
+          <p><strong>Database-per-Service (đúng cách):</strong></p>
+          <ul>
+            <li>Mỗi service sở hữu hoàn toàn DB của mình — thay đổi schema độc lập</li>
+            <li>Có thể chọn DB phù hợp: MariaDB cho data quan hệ, MongoDB cho document</li>
+            <li>Fault isolation: auth_db chết, booking_db vẫn hoạt động</li>
+          </ul>
+          <p>Chi phí: nhiều DB hơn cần nhiều tài nguyên hơn. Trong development dùng Docker Compose giải quyết được.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q">
+          <span>Khó khăn gặp phải khi xây dựng hệ thống này là gì?</span>
+          <span class="qa-q-badge badge-design">Thực tiễn</span>
+        </div>
+        <div class="qa-a">
+          <p><strong>Các vấn đề thực tế đã giải quyết:</strong></p>
+          <ul>
+            <li><strong>Competing consumers:</strong> Messaging Service (Node.js) vô tình chia sẻ queue với Notification Service → 50% event bị mất. Giải quyết: tạo queue riêng <code>saf.socket.queue</code> cho Node.js</li>
+            <li><strong>Jackson boolean serialization:</strong> Field <code>boolean isRead</code> bị serialize thành <code>"read"</code> thay vì <code>"isRead"</code> do JavaBeans convention → thêm <code>@JsonProperty</code></li>
+            <li><strong>RabbitMQ message converter:</strong> Spring AMQP dùng SimpleMessageConverter mặc định không deserialize JSON → phải cấu hình explicit <code>Jackson2JsonMessageConverter</code></li>
+            <li><strong>Inter-service auth:</strong> Các internal endpoint cần phân biệt call từ service khác vs client bên ngoài</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <h3>🏠 SmartAccommodationFinder</h3>
+  <p>Polyglot Microservices · Docker Compose · Spring Boot 3 + Node.js + React 18</p>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>Backend Services</h4>
+      <ul>
+        <li>Auth Service (Spring Boot)</li>
+        <li>Room Service (Spring Boot)</li>
+        <li>Booking Service (Spring Boot)</li>
+        <li>Payment Service (Spring Boot)</li>
+        <li>Notification Service (Spring Boot)</li>
+        <li>Messaging Service (Node.js)</li>
+        <li>AI Chat Service (Node.js)</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Infrastructure</h4>
+      <ul>
+        <li>Nginx (API Gateway)</li>
+        <li>RabbitMQ (Message Broker)</li>
+        <li>5× MariaDB</li>
+        <li>MongoDB</li>
+        <li>Docker Compose</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Frontend</h4>
+      <ul>
+        <li>React 18 + TypeScript</li>
+        <li>Zustand (State Management)</li>
+        <li>Tailwind CSS</li>
+        <li>Socket.IO Client</li>
+        <li>Leaflet.js (Maps)</li>
+        <li>React Native (Mobile)</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:16px;font-size:11px">Tài liệu này được tạo tự động từ mã nguồn dự án. Mở bằng trình duyệt bất kỳ, không cần server.</p>
+</footer>
+
+</body>
+</html>

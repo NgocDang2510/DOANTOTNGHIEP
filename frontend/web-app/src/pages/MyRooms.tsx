@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Home, MapPin, Star, User, Phone, Mail } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Home, MapPin, Star, User, Phone, Mail } from 'lucide-react';
 import { roomService, type RoomResponse } from '../services/roomService';
 import { useConfirmStore } from '../stores/confirmStore';
 import { useAuthStore } from '../stores/authStore';
@@ -16,6 +16,7 @@ const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
   AVAILABLE: { label: 'Còn trống', cls: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
   RENTED: { label: 'Đang thuê', cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
   HIDDEN: { label: 'Đã ẩn', cls: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' },
+  MAINTENANCE: { label: 'Bảo trì', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
 };
 
 const MyRooms = () => {
@@ -27,6 +28,7 @@ const MyRooms = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [tenants, setTenants] = useState<Record<number, TenantInfo>>({});
+  const [changingStatus, setChangingStatus] = useState<number | null>(null);
 
   const loadTenant = async (roomId: number) => {
     try {
@@ -64,10 +66,15 @@ const MyRooms = () => {
     }
   };
 
-  const handleToggleStatus = async (room: RoomResponse) => {
-    const newStatus = room.status === 'HIDDEN' ? 'AVAILABLE' : 'HIDDEN';
-    const updated = await roomService.changeStatus(room.id, newStatus);
-    setRooms(prev => prev.map(r => r.id === updated.id ? updated : r));
+  const handleChangeStatus = async (room: RoomResponse, newStatus: string) => {
+    if (newStatus === room.status || changingStatus === room.id) return;
+    setChangingStatus(room.id);
+    try {
+      const updated = await roomService.changeStatus(room.id, newStatus);
+      setRooms(prev => prev.map(r => r.id === updated.id ? updated : r));
+    } catch { /* silent */ } finally {
+      setChangingStatus(null);
+    }
   };
 
   return (
@@ -136,12 +143,18 @@ const MyRooms = () => {
                       className="p-2 text-gray-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-colors">
                       <Edit2 className="w-4 h-4" />
                     </button>
-                    {room.status !== 'RENTED' && (
-                      <button onClick={() => handleToggleStatus(room)} title={room.status === 'HIDDEN' ? 'Hiện phòng' : 'Ẩn phòng'}
-                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                        {room.status === 'HIDDEN' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                      </button>
-                    )}
+                    <select
+                      value={room.status}
+                      disabled={changingStatus === room.id}
+                      onChange={e => handleChangeStatus(room, e.target.value)}
+                      title="Đổi trạng thái"
+                      className="text-xs px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer hover:border-blue-300 focus:outline-none focus:border-blue-500 disabled:opacity-50 transition-colors"
+                    >
+                      <option value="AVAILABLE">Còn trống</option>
+                      <option value="RENTED">Đang thuê</option>
+                      <option value="MAINTENANCE">Bảo trì</option>
+                      <option value="HIDDEN">Ẩn</option>
+                    </select>
                     <button onClick={() => handleDelete(room.id, room.title)} title="Xóa"
                       className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />

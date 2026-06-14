@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Upload, X, Plus, ChevronLeft, MapPin } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { roomService, type RoomRequest } from '../services/roomService';
@@ -48,6 +48,33 @@ function MapClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number
   return null;
 }
 
+interface NominatimAddress {
+  house_number?: string;
+  road?: string;
+  suburb?: string;
+  quarter?: string;
+  city_district?: string;
+  district?: string;
+  county?: string;
+  city?: string;
+  town?: string;
+  state?: string;
+}
+interface NominatimResult { display_name: string; lat: string; lon: string; address?: NominatimAddress; }
+
+function MapViewController({ target }: { target: [number, number] | null }) {
+  const map = useMap();
+  const prevKey = useRef('');
+  useEffect(() => {
+    if (!target) return;
+    const key = `${target[0]},${target[1]}`;
+    if (key === prevKey.current) return;
+    prevKey.current = key;
+    map.flyTo(target, 16, { animate: true, duration: 1 });
+  }, [target, map]);
+  return null;
+}
+
 const PostRoom = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -62,6 +89,11 @@ const PostRoom = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [geocoding, setGeocoding] = useState(false);
+  const [suggestions, setSuggestions] = useState<NominatimResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [mapTarget, setMapTarget] = useState<[number, number] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const searchRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -85,6 +117,50 @@ const PostRoom = () => {
     }));
   };
 
+  const handleAddressChange = (value: string) => {
+    set('address', value);
+    clearTimeout(searchRef.current);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    if (value.trim().length < 3) { setSearching(false); return; }
+    setSearching(true);
+    searchRef.current = setTimeout(async () => {
+      try {
+        const q = [value.trim(), form.district, form.city].filter(Boolean).join(', ');
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&addressdetails=1`,
+          { headers: { 'Accept-Language': 'vi' } }
+        );
+        const data: NominatimResult[] = await res.json();
+        setSuggestions(data);
+        setShowSuggestions(data.length > 0);
+      } catch (err) {
+        console.error('Geocode search error:', err);
+      } finally {
+        setSearching(false);
+      }
+    }, 700);
+  };
+
+  const selectSuggestion = (s: NominatimResult) => {
+    const lat = parseFloat(s.lat);
+    const lon = parseFloat(s.lon);
+    const updates: Partial<FormState> = { latitude: lat, longitude: lon };
+    if (s.address) {
+      const a = s.address;
+      const street = [a.house_number, a.road].filter(Boolean).join(' ');
+      const district = a.city_district || a.district || a.county || a.city || a.suburb || a.quarter || '';
+      const city = a.state || a.city || a.town || '';
+      if (street) updates.address = street;
+      if (district) updates.district = district;
+      if (city) updates.city = city;
+    }
+    setForm(f => ({ ...f, ...updates }));
+    setMapTarget([lat, lon]);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
   const handleMapClick = useCallback(async (lat: number, lng: number) => {
     setForm(f => ({ ...f, latitude: lat, longitude: lng }));
     setGeocoding(true);
@@ -96,9 +172,9 @@ const PostRoom = () => {
       const data = await resp.json();
       if (data.address) {
         const a = data.address;
-        const addressStr = [a.house_number, a.road, a.suburb || a.quarter].filter(Boolean).join(' ');
-        const districtStr = a.city_district || a.district || a.county || '';
-        const cityStr = a.city || a.town || a.state || '';
+        const addressStr = [a.house_number, a.road].filter(Boolean).join(' ');
+        const districtStr = a.city_district || a.district || a.county || a.city || a.suburb || a.quarter || '';
+        const cityStr = a.state || a.city || a.town || '';
         setForm(f => ({
           ...f,
           ...(addressStr ? { address: addressStr } : {}),
@@ -205,12 +281,39 @@ const PostRoom = () => {
           </div>
         </div>
 
-        {/* Address */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 space-y-4">
+        {/* Address — relative z-10 lifts this card above the Leaflet map card below it */}
+        <div className="relative z-10 bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 space-y-4">
           <h2 className="font-bold text-gray-900 dark:text-white">Địa chỉ</h2>
-          <div>
+          <div className="relative">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Địa chỉ cụ thể *</label>
-            <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="Số nhà, tên đường..." className={inputCls} />
+            <div className="relative">
+              <input
+                value={form.address}
+                onChange={e => handleAddressChange(e.target.value)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                placeholder="Số nhà, tên đường... (tự gợi ý trên bản đồ)"
+                className={inputCls}
+              />
+              {searching && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              )}
+            </div>
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-[1000] top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl max-h-56 overflow-y-auto">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onMouseDown={() => selectSuggestion(s)}
+                    className="w-full text-left px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 flex items-start gap-2"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0" />
+                    <span className="line-clamp-2">{s.display_name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -229,7 +332,7 @@ const PostRoom = () => {
               <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-blue-500" />
                 Vị trí trên bản đồ
-                <span className="text-gray-400 font-normal">(click để chọn — tự điền địa chỉ)</span>
+                <span className="text-gray-400 font-normal">(nhập địa chỉ để tìm, hoặc click trực tiếp)</span>
               </label>
               {markerPos && (
                 <button type="button"
@@ -247,6 +350,7 @@ const PostRoom = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <MapClickHandler onMapClick={handleMapClick} />
+                <MapViewController target={mapTarget} />
                 {markerPos && <Marker position={markerPos} />}
               </MapContainer>
             </div>

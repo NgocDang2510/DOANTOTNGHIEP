@@ -45,6 +45,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     long countByLandlordId(Long landlordId);
 
+    long countByLandlordIdAndStatus(Long landlordId, RoomStatus status);
+
     @Query("SELECT r FROM Room r WHERE r.landlordId = :landlordId ORDER BY r.viewCount DESC")
     List<Room> findTopByLandlordOrderByViewCount(@Param("landlordId") Long landlordId, Pageable pageable);
 
@@ -88,6 +90,4 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         @Param("radius") double radius,
         Pageable pageable
     );
-
-    long countByStatus(RoomStatus status);
 }

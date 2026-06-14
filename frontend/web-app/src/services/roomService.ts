@@ -16,7 +16,7 @@ export interface RoomResponse {
   longitude: number | null;
   area: number | null;
   roomType: 'SINGLE' | 'SHARED' | 'APARTMENT' | 'HOUSE';
-  status: 'AVAILABLE' | 'RENTED' | 'HIDDEN';
+  status: 'AVAILABLE' | 'RENTED' | 'HIDDEN' | 'MAINTENANCE';
   imageUrls: string[];
   amenities: string[];
   averageRating: number | null;

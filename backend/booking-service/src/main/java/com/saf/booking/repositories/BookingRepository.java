@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -28,4 +29,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT DISTINCT b.roomId FROM Booking b WHERE b.studentId = :studentId AND b.status IN :statuses")
     List<Long> findBookedRoomIdsByStudent(@Param("studentId") Long studentId, @Param("statuses") List<BookingStatus> statuses);
+
+    @Query("SELECT MONTH(b.createdAt), YEAR(b.createdAt), COUNT(b) FROM Booking b WHERE b.landlordId = :landlordId AND b.createdAt >= :since GROUP BY YEAR(b.createdAt), MONTH(b.createdAt)")
+    List<Object[]> countByMonthForLandlord(@Param("landlordId") Long landlordId, @Param("since") LocalDateTime since);
 }

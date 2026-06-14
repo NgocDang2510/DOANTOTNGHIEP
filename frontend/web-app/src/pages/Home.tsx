@@ -113,17 +113,9 @@ const Home = () => {
   const { user } = useAuthStore();
   const { add: addCompare, remove: removeCompare, has: isCompared } = useCompareStore();
   const { history: viewHistory, clearHistory } = useViewHistory();
-  const [recommendations, setRecommendations] = useState<RoomResponse[]>([]);
   const [nearbyRooms, setNearbyRooms] = useState<RoomResponse[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
-
-  useEffect(() => {
-    if (!user) { setRecommendations([]); return; }
-    api.get('/rooms/recommendations?limit=6')
-      .then(r => setRecommendations(r.data.data || []))
-      .catch(() => {});
-  }, [user]);
 
   const handleFindNearby = () => {
     if (!navigator.geolocation) return;
@@ -271,36 +263,6 @@ const Home = () => {
         </div>
       )}
 
-      {/* AI Recommendations */}
-      {user && recommendations.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-bold px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">AI</span>
-            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Gợi ý cho bạn</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {recommendations.map(room => (
-              <div
-                key={room.id}
-                onClick={() => navigate(`/rooms/${room.id}`)}
-                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all"
-              >
-                <div className="h-24 bg-gray-100 dark:bg-gray-700">
-                  {room.imageUrls[0]
-                    ? <img src={room.imageUrls[0]} alt={room.title} className="w-full h-full object-cover" />
-                    : <div className="w-full h-full flex items-center justify-center"><HomeIcon className="w-6 h-6 text-gray-300" /></div>
-                  }
-                </div>
-                <div className="p-2">
-                  <p className="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-1">{room.title}</p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 font-bold">{Number(room.price).toLocaleString('vi-VN')}đ</p>
-                  <p className="text-[10px] text-gray-400 truncate">{room.district || room.city}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Search bar */}
       <form onSubmit={handleSearch} className="mb-6">

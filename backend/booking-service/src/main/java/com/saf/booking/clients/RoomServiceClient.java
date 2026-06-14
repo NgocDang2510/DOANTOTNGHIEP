@@ -19,4 +19,7 @@ public interface RoomServiceClient {
 
     @GetMapping("/api/internal/rooms/stats")
     ApiResponse<Object> getRoomStats();
+
+    @GetMapping("/api/internal/rooms/landlord-stats")
+    ApiResponse<Object> getLandlordRoomStats(@RequestParam("landlordId") Long landlordId);
 }
