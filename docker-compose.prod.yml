@@ -1,0 +1,96 @@
+version: '3.8'
+
+# ══════════════════════════════════════════════════════
+#  Production config — memory optimized for 1GB RAM
+#  Run: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# ══════════════════════════════════════════════════════
+
+services:
+
+  rabbitmq:
+    restart: always
+    mem_limit: 128m
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-saf}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-saf123}
+
+  zipkin:
+    restart: always
+    mem_limit: 128m
+
+  mariadb:
+    restart: always
+    command: >-
+      --innodb-buffer-pool-size=64M
+      --innodb-log-file-size=16M
+      --max-connections=50
+      --key-buffer-size=16M
+      --tmp-table-size=16M
+      --max-heap-table-size=16M
+    mem_limit: 200m
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD:-StrongPassword123!}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MARIADB_PASSWORD:-StrongPassword123!}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mongodb:
+    restart: always
+    command: mongod --wiredTigerCacheSizeGB 0.25
+    mem_limit: 250m
+
+  spring-boot-api:
+    restart: always
+    mem_limit: 400m
+    environment:
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD:-StrongPassword123!}
+      JWT_SECRET: ${JWT_SECRET}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      JAVA_OPTS: -Xms128m -Xmx256m -XX:+UseSerialGC
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY:-}
+      AWS_S3_REGION: ${AWS_S3_REGION:-ap-southeast-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-lab456-demo-bucket}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER:-saf}
+      RABBITMQ_PASS: ${RABBITMQ_PASS:-saf123}
+      ZIPKIN_URL: http://zipkin:9411
+
+  nodejs-messaging:
+    restart: always
+    mem_limit: 100m
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      NODE_OPTIONS: --max-old-space-size=64
+      RABBITMQ_URI: amqp://${RABBITMQ_USER:-saf}:${RABBITMQ_PASS:-saf123}@rabbitmq:5672
+
+  ai-chat-service:
+    restart: always
+    mem_limit: 100m
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      NODE_OPTIONS: --max-old-space-size=64
+
+  web-app:
+    restart: always
+    mem_limit: 30m
+
+  api-gateway:
+    restart: always
+    mem_limit: 20m
+    ports:
+      - "80:80"
+
+volumes:
+  mariadb-data:
+  mongodb-data:
+
+networks:
+  saf-network:
+    driver: bridge

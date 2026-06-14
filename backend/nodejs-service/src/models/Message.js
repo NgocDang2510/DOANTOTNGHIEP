@@ -1,0 +1,90 @@
+import mongoose from 'mongoose';
+
+const messageSchema = new mongoose.Schema(
+  {
+    conversationId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    senderId: {
+      type: String,
+      required: true,
+    },
+    receiverId: {
+      type: String,
+      default: null,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    messageType: {
+      type: String,
+
+      enum: ['text', 'image', 'video', 'audio', 'file', 'sticker', 'contact', 'system', 'location', 'reminder', 'group_call', 'poll'],
+
+      default: 'text',
+    },
+    fileUrl: {
+      type: String,
+      default: null,
+    },
+    fileName: {
+      type: String,
+      default: null,
+    },
+    fileSize: {
+      type: Number,
+      default: null,
+    },
+    status: {
+      type: String,
+      enum: ['sent', 'received', 'seen'],
+      default: 'sent',
+    },
+    reactions: [
+      {
+        userId: { type: String, required: true },
+        type: { type: String, enum: ['like', 'love', 'haha', 'wow', 'sad', 'angry'], required: true },
+      }
+    ],
+    seenBy: [
+      {
+        userId: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now }
+      }
+    ],
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+    editedAt: {
+      type: Date,
+      default: null,
+    },
+    isRevoked: {
+      type: Boolean,
+      default: false,
+    },
+    deletedBy: [
+      {
+        type: String,
+      }
+    ],
+    replyTo: {
+      messageId: String,
+      content: String,
+      senderId: String,
+      messageType: String,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Index for faster queries
+messageSchema.index({ conversationId: 1, createdAt: -1 });
+
+export default mongoose.model('Message', messageSchema);

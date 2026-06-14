@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Zalo-style blue circle background -->
+  <circle cx="32" cy="32" r="32" fill="#0068FF"/>
+  <!-- Z letter stylized like Zalo logo -->
+  <path d="M18 18h28v6H27.5l18.5 16v6H18v-6h18.5L18 24V18z" fill="white"/>
+  <!-- Small speech bubble accent -->
+  <circle cx="50" cy="48" r="4" fill="white" opacity="0.6"/>
+</svg>

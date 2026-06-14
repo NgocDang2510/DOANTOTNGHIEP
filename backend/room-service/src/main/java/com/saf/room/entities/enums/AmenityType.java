@@ -1,0 +1,7 @@
+package com.saf.room.entities.enums;
+
+public enum AmenityType {
+    WIFI, AIR_CONDITIONER, WASHING_MACHINE, PARKING, ELEVATOR,
+    SECURITY, KITCHEN, REFRIGERATOR, WATER_HEATER, BALCONY,
+    PET_ALLOWED, PRIVATE_BATHROOM
+}

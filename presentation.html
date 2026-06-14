@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SmartAccommodationFinder — Tổng quan hệ thống</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-dark: #1e40af;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --cyan: #0891b2;
+  --cyan-light: #ecfeff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --gray-light: #f8fafc;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f1f5f9;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #0ea5e9 100%);
+  color: white;
+  padding: 60px 40px 72px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.hero h1 span { color: #93c5fd; }
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.85;
+  max-width: 580px;
+  margin: 0 auto 28px;
+}
+.hero-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.hero-tag {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* LAYOUT */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 60px 24px; }
+.section-white { background: white; }
+.section-gray  { background: var(--gray-light); }
+.section-dark  { background: #0f172a; color: #e2e8f0; }
+
+.section-header { margin-bottom: 36px; }
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.section-title .badge {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.section-desc {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding-left: 52px;
+  max-width: 700px;
+}
+
+/* STATS BAR */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.stat-item {
+  background: white;
+  padding: 24px 20px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1e40af, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 12.5px; color: var(--text-muted); line-height: 1.4; }
+
+/* SERVICE CARDS — DETAILED */
+.service-detail {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.service-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.service-icon-box {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.service-meta { flex: 1; }
+.service-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
+.service-subtitle { font-size: 13px; color: var(--text-muted); }
+.service-port-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #475569;
+  white-space: nowrap;
+}
+.service-body { padding: 24px 28px; }
+.service-why {
+  background: #f8fafc;
+  border-left: 3px solid var(--blue);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: #334155;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.service-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.service-col-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.feature-list { list-style: none; }
+.feature-list li {
+  font-size: 13.5px;
+  color: #334155;
+  padding: 5px 0;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  border-bottom: 1px solid #f1f5f9;
+  line-height: 1.5;
+}
+.feature-list li:last-child { border-bottom: none; }
+.feature-list .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+.tech-stack-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tech-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
+}
+.tc-blue   { background: var(--blue-light);   color: var(--blue-dark); border-color: #bfdbfe; }
+.tc-green  { background: var(--green-light);  color: #15803d;          border-color: #86efac; }
+.tc-purple { background: var(--purple-light); color: #6d28d9;          border-color: #c4b5fd; }
+.tc-amber  { background: var(--amber-light);  color: #b45309;          border-color: #fcd34d; }
+.tc-red    { background: var(--red-light);    color: var(--red);       border-color: #fca5a5; }
+.tc-cyan   { background: var(--cyan-light);   color: var(--cyan);      border-color: #67e8f9; }
+.tc-gray   { background: #f1f5f9;             color: #475569;          border-color: #cbd5e1; }
+
+/* FLOW */
+.flow-wrap { max-width: 760px; margin: 0 auto; }
+.flow-step {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.flow-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.flow-dot {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.flow-line { width: 2px; background: #e2e8f0; flex: 1; min-height: 20px; }
+.flow-content {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  flex: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.flow-content h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.flow-content p  { font-size: 13.5px; color: #475569; line-height: 1.6; margin-bottom: 10px; }
+.flow-steps-mini { display: flex; flex-wrap: wrap; gap: 6px; }
+.flow-step-mini {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #475569;
+}
+.flow-step-mini strong { color: var(--text); }
+
+/* DB */
+.db-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.db-card {
+  background: white;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.db-top { padding: 22px 24px 18px; border-bottom: 1px solid var(--border); }
+.db-top h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; }
+.db-top p { font-size: 13px; color: var(--text-muted); }
+.db-body { padding: 18px 24px; }
+.db-table-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+}
+.db-table-row:last-child { border-bottom: none; }
+.db-table-name {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 12.5px;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  min-width: 110px;
+}
+.db-table-desc { color: #475569; line-height: 1.5; }
+
+/* ROLE SECTION */
+.roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.role-card { border-radius: 18px; overflow: hidden; border: 1px solid; }
+.role-card.student { border-color: #bfdbfe; }
+.role-card.landlord { border-color: #bbf7d0; }
+.role-card.admin    { border-color: #ddd6fe; }
+.role-top { padding: 22px 24px 18px; }
+.role-top.student  { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+.role-top.landlord { background: linear-gradient(135deg, #f0fdf4, #dcfce7); }
+.role-top.admin    { background: linear-gradient(135deg, #f5f3ff, #ede9fe); }
+.role-emoji-big { font-size: 2.5rem; margin-bottom: 8px; }
+.role-title-big { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+.role-desc { font-size: 13px; color: #475569; }
+.role-body { background: white; padding: 18px 24px; }
+.role-section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 8px; margin-top: 14px;
+}
+.role-section-title:first-child { margin-top: 0; }
+.role-item {
+  font-size: 13px; color: #334155; padding: 4px 0;
+  display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;
+}
+.role-item::before { content: '▸'; flex-shrink: 0; margin-top: 1px; }
+.role-card.student .role-item::before { color: var(--blue); }
+.role-card.landlord .role-item::before { color: var(--green); }
+.role-card.admin .role-item::before   { color: var(--purple); }
+
+/* KEY POINTS */
+.kp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.kp-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 22px;
+  border-top: 4px solid;
+}
+.kp-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+.kp-card p  { font-size: 13px; color: #475569; line-height: 1.6; }
+.kp-card code {
+  display: inline-block;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11.5px;
+  font-family: monospace;
+  color: #334155;
+  margin-top: 8px;
+}
+
+/* ARCH DIAGRAM */
+.arch-box {
+  background: #0f172a;
+  border-radius: 16px;
+  padding: 28px 32px;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.9;
+  overflow-x: auto;
+  margin-bottom: 32px;
+}
+.arch-box pre { color: #94a3b8; }
+.cb { color: #60a5fa; }  /* blue */
+.cg { color: #4ade80; }  /* green */
+.cy { color: #fbbf24; }  /* yellow */
+.cp { color: #c084fc; }  /* purple */
+.cc { color: #67e8f9; }  /* cyan */
+.cw { color: #f1f5f9; font-weight: 600; } /* white bold */
+
+/* FOOTER */
+.footer {
+  background: #0f172a;
+  color: #64748b;
+  text-align: center;
+  padding: 40px 24px;
+  font-size: 13px;
+}
+.footer strong { color: white; }
+
+@media (max-width: 680px) {
+  .service-cols { grid-template-columns: 1fr; }
+  .db-wrapper { grid-template-columns: 1fr; }
+  .arch-box { font-size: 11px; padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HERO ═══════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">🎓 Đồ án tốt nghiệp — 2026</div>
+  <h1>Smart<span>Accommodation</span>Finder</h1>
+  <p>Nền tảng tìm kiếm và đặt phòng trọ thông minh dành cho sinh viên — kết hợp AI, bản đồ và thanh toán trực tuyến</p>
+  <div class="hero-tags">
+    <span class="hero-tag">☕ Spring Boot</span>
+    <span class="hero-tag">🟢 Node.js</span>
+    <span class="hero-tag">⚛️ React + React Native</span>
+    <span class="hero-tag">🤖 Gemini AI</span>
+    <span class="hero-tag">🗺️ Leaflet + OpenStreetMap</span>
+    <span class="hero-tag">💳 VNPay</span>
+    <span class="hero-tag">🐋 Docker Compose</span>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════ STATS BAR ════════════════════════════════ -->
+<div class="section section-white" style="padding:32px 24px">
+  <div class="container">
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Service độc lập</div></div>
+      <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Vai trò người dùng</div></div>
+      <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Cơ sở dữ liệu</div></div>
+      <div class="stat-item"><div class="stat-num">AI</div><div class="stat-label">Gemini 2.5 Flash tích hợp</div></div>
+      <div class="stat-item"><div class="stat-num">RT</div><div class="stat-label">Real-time messaging Socket.io</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ KIẾN TRÚC TỔNG QUAN ═════════════════════════ -->
+<div class="section section-gray">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#eff6ff">🏗️</div>
+        Kiến trúc hệ thống — Polyglot Microservices
+      </div>
+      <div class="section-desc">
+        Hệ thống được chia thành <strong>5 service chạy độc lập</strong>, mỗi service giải quyết một bài toán cụ thể và dùng công nghệ phù hợp nhất. Tất cả được kết nối với nhau thông qua REST API và WebSocket.
+      </div>
+    </div>
+
+    <div class="arch-box">
+<pre>
+              <span class="cw">Web Browser / Mobile App</span>
+                       <span class="cg">│  HTTP :80 (duy nhất)</span>
+                       <span class="cg">▼</span>
+   <span class="cb">╔══════════════════════════════════════════════════════╗</span>
+   <span class="cb">║</span>          <span class="cw">🔀 API Gateway</span>  <span class="cg">(Nginx)</span>  <span class="cy">port 80</span>           <span class="cb">║</span>
+   <span class="cb">║</span>   <span class="c-gray">Single Entry Point — định tuyến tất cả traffic</span>      <span class="cb">║</span>
+   <span class="cb">╚══╤══════════╤══════════════╤════════════╤═══════════╝</span>
+      <span class="cg">│/           │/api/messages  │/api/ai-chat  │/api/*</span>
+      <span class="cg">│            │/socket.io/    │              │</span>
+      <span class="cg">▼            ▼               ▼              ▼</span>
+   <span class="cy">┌──────────┐ ┌─────────────┐ ┌────────────┐ ┌──────────────┐</span>
+   <span class="cy">│</span><span class="cc">⚛ Web App</span> <span class="cy">│ │</span><span class="cg">🟢 Messaging</span> <span class="cy">│ │</span><span class="cp">🤖 AI Chat</span>  <span class="cy">│ │</span><span class="cy">☕ Spring Boot</span><span class="cy">│</span>
+   <span class="cy">│</span><span class="c-gray">React SPA</span>  <span class="cy">│ │</span><span class="c-gray">Node.js+WS  </span><span class="cy">│ │</span><span class="c-gray">Gemini 2.5</span>  <span class="cy">│ │</span><span class="c-gray">Core API    </span><span class="cy">│</span>
+   <span class="ty">│</span><span class="c-gray">:80 internal</span><span class="cy">│ │</span><span class="c-gray">:3001 internal</span><span class="cy">│ │</span><span class="c-gray">:3002 internal</span><span class="cy">│ │</span><span class="c-gray">:8082 internal</span><span class="cy">│</span>
+   <span class="cy">└──────────┘ └──────┬──────┘ └────────────┘ └──────┬───────┘</span>
+                       <span class="cw">│ /health ✓               /health ✓│</span>
+                  <span class="cb">┌────▼───────────────────────────▼────┐</span>
+                  <span class="cb">│</span>  <span class="cg">🟢 MongoDB</span>         <span class="cy">🔵 MariaDB</span>       <span class="cb">│</span>
+                  <span class="cb">│</span>  <span class="c-gray">Tin nhắn</span>           <span class="c-gray">Nghiệp vụ</span>       <span class="cb">│</span>
+                  <span class="cb">│</span>  <span class="c-gray">:27017 internal     :3306 internal</span>  <span class="cb">│</span>
+                  <span class="cb">└─────────────────────────────────────┘</span>
+                  <span class="cg">    /health ✓              /health ✓</span>
+</pre>
+    </div>
+
+    <p style="font-size:13.5px;color:#475569;text-align:center;margin-top:-16px;margin-bottom:0">
+      💡 <strong>Điểm khác biệt so với Multi-Service thông thường:</strong> Có API Gateway làm điểm vào duy nhất. Tất cả backend ports đều là <em>internal-only</em> — không thể truy cập trực tiếp từ bên ngoài. Health check bảo đảm service nào sẵn sàng mới nhận traffic.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 5 SERVICES CHI TIẾT ═════════════════════════ -->
+<div class="section section-white">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#fef9c3">⚙️</div>
+        5 Service — Chi tiết từng cái làm gì
+      </div>
+      <div class="section-desc">
+        Giải thích rõ vai trò, trách nhiệm và lý do chọn công nghệ của từng service trong hệ thống.
+      </div>
+    </div>
+
+    <!-- SERVICE 1: SPRING BOOT -->
+    <div class="service-detail">
+      <div class="service-header">
+        <div class="service-icon-box" style="background:#fef3c7">☕</div>
+        <div class="service-meta">
+          <div class="service-title">Service 1 — Spring Boot API (Backend chính)</div>
+          <div class="service-subtitle">Xử lý toàn bộ nghiệp vụ kinh doanh, bảo mật, và kết nối cơ sở dữ liệu MariaDB</div>
+        </div>
+        <div class="service-port-tag">🔌 port 8082</div>
+      </div>
+      <div class="service-body">
+        <div class="service-why">
+          <strong>Tại sao chọn Spring Boot?</strong> Spring Boot có Spring Security mạnh (JWT, OAuth2), Spring Data JPA giúp thao tác database an toàn không bị SQL Injection, cộng đồng lớn và được dùng rộng rãi trong doanh nghiệp. Đây là service trung tâm — tất cả logic kinh doanh quan trọng đều nằm ở đây.
+        </div>
+        <div class="service-cols">
+          <div>
+            <div class="service-col-title">📋 Service này làm những gì?</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#2563eb"></span><strong>Đăng ký / Đăng nhập</strong> — tạo tài khoản, hash mật khẩu bằng BCrypt, cấp JWT access token (15 phút) và refresh token (7 ngày)</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Quản lý phòng</strong> — chủ nhà đăng phòng với ảnh, tiện ích, tọa độ GPS; sinh viên xem, lọc, tìm kiếm phòng</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Đặt lịch hẹn (Booking)</strong> — sinh viên gửi yêu cầu, chủ nhà xác nhận/từ chối, hệ thống theo dõi trạng thái</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Thanh toán VNPay</strong> — tạo link thanh toán, nhận callback từ VNPay, cập nhật trạng thái đặt cọc và phòng</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Review & Đánh giá</strong> — sinh viên đánh giá sau khi xem phòng, chỉ cho phép khi booking đã COMPLETED</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Upload ảnh lên S3</strong> — ảnh phòng được lưu trên AWS S3, trả về URL ổn định</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Tìm phòng theo GPS</strong> — dùng công thức Haversine trong SQL để tìm phòng trong bán kính N km</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Thống kê & Admin</strong> — biểu đồ lịch hẹn, top phòng xem nhiều, tổng quan hệ thống</li>
+            </ul>
+          </div>
+          <div>
+            <div class="service-col-title">🔧 Công nghệ sử dụng</div>
+            <div class="tech-stack-row" style="margin-bottom:16px">
+              <span class="tech-chip tc-amber">Java 17</span>
+              <span class="tech-chip tc-amber">Spring Boot 3.3.5</span>
+              <span class="tech-chip tc-blue">Spring Security</span>
+              <span class="tech-chip tc-blue">Spring Data JPA</span>
+              <span class="tech-chip tc-blue">JWT (HS512)</span>
+              <span class="tech-chip tc-gray">MariaDB</span>
+              <span class="tech-chip tc-gray">Hibernate ORM</span>
+              <span class="tech-chip tc-green">AWS S3</span>
+              <span class="tech-chip tc-purple">VNPay SDK</span>
+            </div>
+            <div class="service-col-title" style="margin-top:16px">🔐 Bảo mật như thế nào?</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#16a34a"></span>Mật khẩu hash bằng <strong>BCrypt</strong> — không lưu plaintext</li>
+              <li><span class="dot" style="background:#16a34a"></span><strong>JWT</strong> kèm claim <code>type: access/refresh</code> — phân biệt 2 loại token</li>
+              <li><span class="dot" style="background:#16a34a"></span>Mỗi API endpoint có annotation <strong>@PreAuthorize</strong> kiểm tra role</li>
+              <li><span class="dot" style="background:#16a34a"></span>JPA parameterized query — <strong>chống SQL Injection</strong></li>
+              <li><span class="dot" style="background:#16a34a"></span>Access token hết hạn 15 phút → auto refresh bằng refresh token</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE 2: NODE.JS MESSAGING -->
+    <div class="service-detail">
+      <div class="service-header">
+        <div class="service-icon-box" style="background:#f0fdf4">🟢</div>
+        <div class="service-meta">
+          <div class="service-title">Service 2 — Node.js Messaging (Nhắn tin thời gian thực)</div>
+          <div class="service-subtitle">Xử lý chat 1-1 giữa sinh viên và chủ nhà qua WebSocket, lưu lịch sử vào MongoDB</div>
+        </div>
+        <div class="service-port-tag">🔌 port 3001</div>
+      </div>
+      <div class="service-body">
+        <div class="service-why">
+          <strong>Tại sao không dùng Spring Boot cho chat?</strong> Spring Boot theo mô hình thread-per-request — nếu 1000 người đang chat cùng lúc, cần 1000 thread chạy song song, rất tốn bộ nhớ. Node.js dùng event loop (1 thread xử lý tất cả bằng callback) — phù hợp hoàn hảo cho real-time messaging vì đa phần thời gian là <em>chờ</em> dữ liệu, không phải <em>tính toán</em>.
+        </div>
+        <div class="service-cols">
+          <div>
+            <div class="service-col-title">📋 Service này làm những gì?</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#16a34a"></span><strong>Kết nối WebSocket</strong> — khi người dùng mở app, thiết lập kết nối Socket.io liên tục</li>
+              <li><span class="dot" style="background:#16a34a"></span><strong>Gửi/nhận tin nhắn</strong> — tin nhắn được push tức thì đến người nhận không cần refresh trang</li>
+              <li><span class="dot" style="background:#16a34a"></span><strong>Lưu lịch sử</strong> — mỗi tin nhắn được ghi vào MongoDB, tải lại khi mở app</li>
+              <li><span class="dot" style="background:#16a34a"></span><strong>Trạng thái tin nhắn</strong> — đã gửi, đã nhận, đã xem (seen)</li>
+              <li><span class="dot" style="background:#16a34a"></span><strong>Thu hồi tin nhắn</strong> — người gửi có thể thu hồi trong thời gian quy định</li>
+              <li><span class="dot" style="background:#16a34a"></span><strong>Quản lý phòng chat</strong> — tự động tạo cuộc hội thoại khi sinh viên liên hệ chủ nhà lần đầu</li>
+            </ul>
+          </div>
+          <div>
+            <div class="service-col-title">🔧 Công nghệ sử dụng</div>
+            <div class="tech-stack-row" style="margin-bottom:16px">
+              <span class="tech-chip tc-green">Node.js 20</span>
+              <span class="tech-chip tc-green">Express.js</span>
+              <span class="tech-chip tc-green">Socket.io</span>
+              <span class="tech-chip tc-gray">MongoDB</span>
+              <span class="tech-chip tc-gray">Mongoose ODM</span>
+              <span class="tech-chip tc-blue">JWT verify</span>
+            </div>
+            <div class="service-col-title" style="margin-top:16px">🔐 Bảo mật JWT chung</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#16a34a"></span>Dùng <strong>chung JWT secret key</strong> với Spring Boot (HS512)</li>
+              <li><span class="dot" style="background:#16a34a"></span>Node.js tự verify token — <strong>không cần gọi API</strong> sang Spring Boot</li>
+              <li><span class="dot" style="background:#16a34a"></span>Giảm độ trễ, tăng hiệu năng cho real-time messaging</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE 3: AI CHAT -->
+    <div class="service-detail">
+      <div class="service-header">
+        <div class="service-icon-box" style="background:#f5f3ff">🤖</div>
+        <div class="service-meta">
+          <div class="service-title">Service 3 — AI Chat Service (Trợ lý tìm phòng thông minh)</div>
+          <div class="service-subtitle">Dùng Google Gemini 2.5 Flash hiểu câu hỏi tiếng Việt tự nhiên và tự động tìm phòng phù hợp</div>
+        </div>
+        <div class="service-port-tag">🔌 port 3002</div>
+      </div>
+      <div class="service-body">
+        <div class="service-why">
+          <strong>Ý tưởng của tính năng này:</strong> Thay vì sinh viên phải tự điền form tìm kiếm (chọn quận, chọn khoảng giá, v.v.), họ chỉ cần hỏi bằng tiếng Việt bình thường như: <em>"Tìm phòng gần Đại học Bách Khoa, giá dưới 3 triệu"</em> — AI tự hiểu và trả kết quả.
+        </div>
+        <div class="service-cols">
+          <div>
+            <div class="service-col-title">📋 Pipeline hoạt động như thế nào?</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#7c3aed"></span><strong>Bước 1 — Hiểu ý định:</strong> Gemini 2.5 Flash phân tích câu hỏi → trích xuất: địa điểm, giá tối đa, loại phòng, bán kính tìm kiếm</li>
+              <li><span class="dot" style="background:#7c3aed"></span><strong>Bước 2 — Geocoding:</strong> Nominatim API chuyển tên địa danh (VD: "Bách Khoa") → tọa độ GPS (lat, lng) miễn phí</li>
+              <li><span class="dot" style="background:#7c3aed"></span><strong>Bước 3 — Tìm phòng:</strong> Gọi API Spring Boot với tọa độ + bán kính, Spring Boot dùng Haversine trong SQL để lọc</li>
+              <li><span class="dot" style="background:#7c3aed"></span><strong>Bước 4 — Trả kết quả:</strong> Danh sách phòng được trả về hiển thị trực tiếp trong giao diện chat</li>
+            </ul>
+          </div>
+          <div>
+            <div class="service-col-title">🔧 Công nghệ sử dụng</div>
+            <div class="tech-stack-row" style="margin-bottom:16px">
+              <span class="tech-chip tc-green">Node.js</span>
+              <span class="tech-chip tc-purple">Google Gemini 2.5 Flash</span>
+              <span class="tech-chip tc-gray">Nominatim API</span>
+              <span class="tech-chip tc-blue">REST API</span>
+            </div>
+            <div class="service-col-title" style="margin-top:16px">💡 Ví dụ câu hỏi AI hiểu được</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#7c3aed"></span><em>"Tìm phòng gần ĐH Bách Khoa giá dưới 3 triệu"</em></li>
+              <li><span class="dot" style="background:#7c3aed"></span><em>"Phòng ở quận 1 có điều hòa không quá 5 triệu"</em></li>
+              <li><span class="dot" style="background:#7c3aed"></span><em>"Phòng trọ sinh viên khu vực Thủ Đức"</em></li>
+              <li><span class="dot" style="background:#7c3aed"></span>Gemini tự điền giá trị mặc định nếu thiếu (bán kính 5km, không giới hạn giá...)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE 4: WEB APP -->
+    <div class="service-detail">
+      <div class="service-header">
+        <div class="service-icon-box" style="background:#eff6ff">⚛️</div>
+        <div class="service-meta">
+          <div class="service-title">Service 4 — Web App (Giao diện người dùng trên trình duyệt)</div>
+          <div class="service-subtitle">Giao diện web đầy đủ cho cả 3 role: sinh viên, chủ nhà, admin — có dark mode, responsive</div>
+        </div>
+        <div class="service-port-tag">🔌 port 5173</div>
+      </div>
+      <div class="service-body">
+        <div class="service-why">
+          <strong>Tại sao React + TypeScript?</strong> React cho phép xây dựng UI phức tạp bằng cách chia nhỏ thành component tái sử dụng. TypeScript giúp phát hiện lỗi ngay khi code, không đợi chạy mới biết. Vite thay thế Webpack — build nhanh hơn 10-20 lần trong development.
+        </div>
+        <div class="service-cols">
+          <div>
+            <div class="service-col-title">📋 Các màn hình chính</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#2563eb"></span><strong>Trang chủ:</strong> danh sách phòng, lọc, tìm kiếm theo từ khóa</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Bản đồ:</strong> Leaflet + OpenStreetMap, hiển thị marker phòng, "Gần tôi" GPS</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Chi tiết phòng:</strong> ảnh gallery, tiện ích, vị trí bản đồ, đánh giá, nút đặt hẹn</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Lịch đặt hẹn:</strong> sinh viên xem trạng thái booking + badge "Đã cọc"</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Phòng của tôi:</strong> chủ nhà quản lý phòng, xem thông tin người thuê</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Nhắn tin:</strong> chat 1-1 real-time với Socket.io</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>AI Chatbot:</strong> hỏi tìm phòng bằng tiếng Việt tự nhiên</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>Admin Dashboard:</strong> thống kê, quản lý user, quản lý phòng</li>
+            </ul>
+          </div>
+          <div>
+            <div class="service-col-title">🔧 Công nghệ sử dụng</div>
+            <div class="tech-stack-row" style="margin-bottom:16px">
+              <span class="tech-chip tc-blue">React 19</span>
+              <span class="tech-chip tc-blue">TypeScript</span>
+              <span class="tech-chip tc-cyan">Vite</span>
+              <span class="tech-chip tc-cyan">TailwindCSS v4</span>
+              <span class="tech-chip tc-purple">Zustand</span>
+              <span class="tech-chip tc-green">Leaflet</span>
+              <span class="tech-chip tc-green">Socket.io Client</span>
+              <span class="tech-chip tc-gray">Axios</span>
+              <span class="tech-chip tc-gray">Lucide Icons</span>
+            </div>
+            <div class="service-col-title" style="margin-top:16px">📦 Quản lý state (Zustand)</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#2563eb"></span><strong>authStore</strong> — lưu thông tin user đang đăng nhập, JWT token</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>notificationStore</strong> — thông báo real-time từ WebSocket</li>
+              <li><span class="dot" style="background:#2563eb"></span><strong>themeStore</strong> — trạng thái dark/light mode</li>
+              <li><span class="dot" style="background:#2563eb"></span>Nhẹ hơn Redux nhiều, không cần boilerplate phức tạp</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE 5: MOBILE -->
+    <div class="service-detail">
+      <div class="service-header">
+        <div class="service-icon-box" style="background:#fef2f2">📱</div>
+        <div class="service-meta">
+          <div class="service-title">Service 5 — Mobile App (Ứng dụng điện thoại)</div>
+          <div class="service-subtitle">Ứng dụng iOS/Android dùng cùng API với web — xem phòng, đặt hẹn, nhắn tin trên điện thoại</div>
+        </div>
+        <div class="service-port-tag">📲 Expo Go</div>
+      </div>
+      <div class="service-body">
+        <div class="service-why">
+          <strong>Tại sao React Native + Expo?</strong> Viết <em>một lần</em>, chạy được cả Android và iOS. Expo giúp không cần cài Android Studio hay Xcode để test — quét QR bằng điện thoại là chạy ngay. Dùng cùng kiến thức React với web app, tái sử dụng business logic.
+        </div>
+        <div class="service-cols">
+          <div>
+            <div class="service-col-title">📋 Tính năng trên mobile</div>
+            <ul class="feature-list">
+              <li><span class="dot" style="background:#dc2626"></span><strong>Trang cá nhân:</strong> xem/sửa thông tin, đổi ảnh đại diện, đổi tên hiển thị</li>
+              <li><span class="dot" style="background:#dc2626"></span><strong>Tìm kiếm phòng:</strong> lọc theo giá, loại, địa điểm</li>
+              <li><span class="dot" style="background:#dc2626"></span><strong>Nhắn tin:</strong> chat real-time với chủ nhà</li>
+              <li><span class="dot" style="background:#dc2626"></span><strong>Lịch đặt hẹn:</strong> xem và theo dõi trạng thái booking</li>
+              <li><span class="dot" style="background:#dc2626"></span><strong>Tạo nhóm:</strong> tạo nhóm chat (phòng trọ, bạn cùng phòng)</li>
+              <li><span class="dot" style="background:#dc2626"></span><strong>Cài đặt:</strong> đổi hình nền chat, tắt thông báo, chế độ tối</li>
+            </ul>
+          </div>
+          <div>
+            <div class="service-col-title">🔧 Công nghệ sử dụng</div>
+            <div class="tech-stack-row">
+              <span class="tech-chip tc-red">React Native 0.81</span>
+              <span class="tech-chip tc-red">Expo SDK 54</span>
+              <span class="tech-chip tc-gray">React Navigation</span>
+              <span class="tech-chip tc-purple">Zustand</span>
+              <span class="tech-chip tc-gray">Axios</span>
+              <span class="tech-chip tc-green">Socket.io Client</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ VAI TRÒ ══════════════════════════════════ -->
+<div class="section section-gray">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#eff6ff">👥</div>
+        3 Vai trò — Chức năng từng người dùng
+      </div>
+      <div class="section-desc">
+        Hệ thống phân quyền rõ ràng. Mỗi role chỉ thấy và dùng được đúng phần của mình.
+      </div>
+    </div>
+    <div class="roles-grid">
+      <div class="role-card student">
+        <div class="role-top student">
+          <div class="role-emoji-big">🎓</div>
+          <div class="role-title-big" style="color:#1d4ed8">Sinh viên (STUDENT)</div>
+          <div class="role-desc">Người tìm phòng — có thể tìm kiếm, đặt hẹn, đặt cọc và liên hệ chủ nhà</div>
+        </div>
+        <div class="role-body">
+          <div class="role-section-title">Tìm kiếm phòng</div>
+          <div class="role-item">Tìm theo từ khóa, quận/huyện, khoảng giá, loại phòng</div>
+          <div class="role-item">Xem bản đồ, bấm "Gần tôi" để tìm phòng gần vị trí GPS hiện tại</div>
+          <div class="role-item">Hỏi AI chatbot bằng tiếng Việt tự nhiên để tìm phòng</div>
+          <div class="role-item">Lưu phòng yêu thích, so sánh 2-3 phòng song song</div>
+          <div class="role-section-title">Đặt hẹn & Thanh toán</div>
+          <div class="role-item">Gửi yêu cầu đặt lịch xem phòng với ngày giờ mong muốn</div>
+          <div class="role-item">Đặt cọc qua VNPay sau khi chủ nhà xác nhận lịch</div>
+          <div class="role-item">Xem badge "Đã cọc" trên lịch hẹn đã thanh toán</div>
+          <div class="role-section-title">Tương tác</div>
+          <div class="role-item">Nhắn tin 1-1 với chủ nhà qua chat real-time</div>
+          <div class="role-item">Viết đánh giá (1-5 sao + bình luận) sau khi xem phòng</div>
+        </div>
+      </div>
+      <div class="role-card landlord">
+        <div class="role-top landlord">
+          <div class="role-emoji-big">🏠</div>
+          <div class="role-title-big" style="color:#15803d">Chủ nhà (LANDLORD)</div>
+          <div class="role-desc">Người cho thuê — đăng phòng, quản lý lịch hẹn và theo dõi người thuê</div>
+        </div>
+        <div class="role-body">
+          <div class="role-section-title">Quản lý phòng</div>
+          <div class="role-item">Đăng phòng với ảnh, mô tả, tiện ích, giá</div>
+          <div class="role-item">Chọn vị trí chính xác trên bản đồ (map picker), địa chỉ tự điền</div>
+          <div class="role-item">Ẩn/hiện phòng linh hoạt (trạng thái HIDDEN/AVAILABLE)</div>
+          <div class="role-item">Phòng đã có người đặt cọc → tự động RENTED, không thể ẩn/hiện</div>
+          <div class="role-section-title">Quản lý lịch hẹn</div>
+          <div class="role-item">Xem danh sách lịch hẹn chờ xác nhận</div>
+          <div class="role-item">Xác nhận hoặc từ chối yêu cầu đặt lịch</div>
+          <div class="role-item">Thấy badge "Đã cọc" khi sinh viên đã thanh toán đặt cọc</div>
+          <div class="role-item">Xem thông tin người thuê (tên, SĐT, email) khi phòng đã RENTED</div>
+          <div class="role-section-title">Thống kê</div>
+          <div class="role-item">Biểu đồ lịch hẹn theo 12 tháng gần nhất</div>
+          <div class="role-item">Top phòng được xem nhiều nhất</div>
+        </div>
+      </div>
+      <div class="role-card admin">
+        <div class="role-top admin">
+          <div class="role-emoji-big">🛡️</div>
+          <div class="role-title-big" style="color:#6d28d9">Quản trị (ADMIN)</div>
+          <div class="role-desc">Quản lý toàn bộ hệ thống — không tham gia giao dịch, chỉ giám sát và kiểm soát</div>
+        </div>
+        <div class="role-body">
+          <div class="role-section-title">Tổng quan hệ thống</div>
+          <div class="role-item">Dashboard: tổng số user, phòng, lịch hẹn, doanh thu</div>
+          <div class="role-item">Biểu đồ hoạt động theo thời gian thực</div>
+          <div class="role-section-title">Quản lý người dùng</div>
+          <div class="role-item">Xem danh sách tất cả tài khoản (sinh viên + chủ nhà)</div>
+          <div class="role-item">Khoá / mở khoá tài khoản vi phạm</div>
+          <div class="role-item">Xem chi tiết thông tin từng người dùng</div>
+          <div class="role-section-title">Quản lý phòng</div>
+          <div class="role-item">Xem và quản lý tất cả phòng trong hệ thống</div>
+          <div class="role-item">Xoá phòng vi phạm chính sách</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ LUỒNG NGHIỆP VỤ ══════════════════════════ -->
+<div class="section section-white">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#f0fdf4">🔄</div>
+        Luồng nghiệp vụ chính — Từ tìm phòng đến thuê thành công
+      </div>
+      <div class="section-desc">
+        Hành trình đầy đủ của một sinh viên, từ lúc tìm phòng đến khi ký kết và đánh giá.
+      </div>
+    </div>
+    <div class="flow-wrap">
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#2563eb">1</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h4>🔍 Sinh viên tìm phòng</h4>
+          <p>Sinh viên có 3 cách tìm phòng: (1) Dùng thanh lọc — chọn quận, giá, loại phòng. (2) Mở bản đồ Leaflet, bấm "Gần tôi" để tìm phòng trong vòng 5km tính từ vị trí GPS. (3) Hỏi AI Chatbot bằng tiếng Việt tự nhiên như: <em>"tìm phòng gần Bách Khoa dưới 3 triệu"</em> — AI tự xử lý và trả kết quả.</p>
+          <div class="flow-steps-mini">
+            <span class="flow-step-mini"><strong>Web/Mobile</strong> → gọi API Spring Boot</span>
+            <span class="flow-step-mini"><strong>Haversine</strong> tính khoảng cách trong SQL</span>
+            <span class="flow-step-mini"><strong>AI:</strong> Gemini → Nominatim → API</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#0891b2">2</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h4>📅 Đặt lịch xem phòng</h4>
+          <p>Sinh viên chọn phòng thích → bấm "Đặt lịch" → điền ngày giờ muốn đến xem → gửi yêu cầu. Booking được tạo với trạng thái <strong>PENDING</strong>. Chủ nhà nhận thông báo, xem thông tin sinh viên và quyết định xác nhận hoặc từ chối.</p>
+          <div class="flow-steps-mini">
+            <span class="flow-step-mini">Booking: <strong>PENDING</strong></span>
+            <span class="flow-step-mini">Chủ nhà xác nhận → <strong>CONFIRMED</strong></span>
+            <span class="flow-step-mini">Từ chối → <strong>REJECTED</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#16a34a">3</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h4>💳 Đặt cọc qua VNPay</h4>
+          <p>Sau khi lịch được xác nhận, nút "Đặt cọc" xuất hiện. Sinh viên bấm → Spring Boot tạo link VNPay → trình duyệt chuyển sang trang thanh toán sandbox. Sau khi thanh toán thành công, VNPay redirect về <code>/vnpay-return</code> → Spring Boot xác nhận → phòng tự động chuyển từ <strong>AVAILABLE → RENTED</strong> → badge "Đã cọc" hiện cả 2 phía.</p>
+          <div class="flow-steps-mini">
+            <span class="flow-step-mini">Spring Boot tạo URL VNPay</span>
+            <span class="flow-step-mini">VNPay callback → verify hash</span>
+            <span class="flow-step-mini">Payment: <strong>SUCCESS</strong></span>
+            <span class="flow-step-mini">Room: <strong>AVAILABLE → RENTED</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#7c3aed">4</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h4>🏠 Xem phòng thực tế</h4>
+          <p>Sinh viên đến xem phòng theo lịch đã hẹn. Sau khi xem xong, chủ nhà bấm "Đã xem xong" → Booking chuyển sang <strong>COMPLETED</strong>. Chủ nhà lúc này có thể xem đầy đủ thông tin người thuê: tên, số điện thoại, email.</p>
+          <div class="flow-steps-mini">
+            <span class="flow-step-mini">Booking: <strong>CONFIRMED → COMPLETED</strong></span>
+            <span class="flow-step-mini">Chủ nhà thấy thông tin người thuê</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#d97706">5</div>
+        </div>
+        <div class="flow-content">
+          <h4>⭐ Đánh giá & Kết thúc</h4>
+          <p>Sinh viên có thể viết đánh giá (1-5 sao kèm bình luận) cho phòng vừa xem. Hệ thống <strong>chỉ cho phép đánh giá khi booking đã COMPLETED</strong> — đảm bảo không có đánh giá ảo từ người chưa đến xem. Điểm trung bình được tính và hiển thị trên card phòng cho các sinh viên khác tham khảo.</p>
+          <div class="flow-steps-mini">
+            <span class="flow-step-mini">Kiểm tra: booking COMPLETED?</span>
+            <span class="flow-step-mini">Cho phép đánh giá 1-5 sao</span>
+            <span class="flow-step-mini">Cập nhật điểm trung bình phòng</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ DATABASE ══════════════════════════════════ -->
+<div class="section section-gray">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#fef9c3">🗄️</div>
+        Cơ sở dữ liệu — Tại sao dùng 2 loại DB khác nhau?
+      </div>
+      <div class="section-desc">
+        Chiến lược <strong>Polyglot Persistence</strong> — chọn loại database phù hợp nhất với từng bài toán thay vì dùng một DB duy nhất cho tất cả.
+      </div>
+    </div>
+    <div class="db-wrapper">
+      <div class="db-card">
+        <div class="db-top">
+          <div style="font-size:1.8rem;margin-bottom:8px">🔵</div>
+          <h3>MariaDB — Cơ sở dữ liệu quan hệ</h3>
+          <p style="margin-top:6px;font-size:13px;color:#475569"><strong>Dùng cho:</strong> dữ liệu có quan hệ chặt chẽ, cần JOIN, transaction, và tính nhất quán cao (ACID). VD: một booking phải gắn với một phòng và một user cụ thể — không thể sai.</p>
+        </div>
+        <div class="db-body">
+          <div class="db-table-row"><span class="db-table-name">users</span><span class="db-table-desc">Tài khoản người dùng — email, mật khẩu hash, role (STUDENT/LANDLORD/ADMIN), thông tin cá nhân</span></div>
+          <div class="db-table-row"><span class="db-table-name">rooms</span><span class="db-table-desc">Thông tin phòng — giá, loại, tọa độ GPS lat/lng, trạng thái (AVAILABLE/RENTED/HIDDEN)</span></div>
+          <div class="db-table-row"><span class="db-table-name">bookings</span><span class="db-table-desc">Lịch hẹn xem phòng — gắn với room + student, trạng thái PENDING/CONFIRMED/COMPLETED/REJECTED</span></div>
+          <div class="db-table-row"><span class="db-table-name">payments</span><span class="db-table-desc">Giao dịch đặt cọc VNPay — mã giao dịch, số tiền, trạng thái SUCCESS/PENDING/FAILED</span></div>
+          <div class="db-table-row"><span class="db-table-name">reviews</span><span class="db-table-desc">Đánh giá của sinh viên — điểm sao, bình luận, gắn với booking đã COMPLETED</span></div>
+          <div class="db-table-row"><span class="db-table-name">room_images</span><span class="db-table-desc">URL ảnh phòng lưu trên AWS S3</span></div>
+          <div class="db-table-row"><span class="db-table-name">room_amenities</span><span class="db-table-desc">Danh sách tiện ích: WiFi, điều hòa, chỗ để xe, v.v.</span></div>
+          <div class="db-table-row"><span class="db-table-name">favorites</span><span class="db-table-desc">Danh sách phòng yêu thích của từng sinh viên</span></div>
+        </div>
+      </div>
+      <div class="db-card">
+        <div class="db-top">
+          <div style="font-size:1.8rem;margin-bottom:8px">🟢</div>
+          <h3>MongoDB — Cơ sở dữ liệu NoSQL document</h3>
+          <p style="margin-top:6px;font-size:13px;color:#475569"><strong>Dùng cho:</strong> dữ liệu linh hoạt, append-only (chỉ thêm không sửa), khối lượng lớn, không cần JOIN phức tạp. Tin nhắn chat phù hợp hoàn hảo: chỉ ghi thêm vào, đọc theo thứ tự thời gian.</p>
+        </div>
+        <div class="db-body">
+          <div class="db-table-row"><span class="db-table-name">conversations</span><span class="db-table-desc">Hội thoại giữa 2 người dùng — lưu danh sách participants, tin nhắn cuối, thời gian cập nhật. Tự động tạo khi 2 người nhắn lần đầu.</span></div>
+          <div class="db-table-row"><span class="db-table-name">messages</span><span class="db-table-desc">Từng tin nhắn — nội dung, người gửi, thời gian, trạng thái seen/revoked. Dữ liệu append-only, không cần UPDATE, phù hợp MongoDB.</span></div>
+          <div style="margin-top:16px;background:#f0fdf4;border-radius:10px;padding:14px;font-size:13px;color:#166534">
+            💡 <strong>Tại sao không dùng MariaDB cho chat?</strong><br/>
+            SQL phải lock row khi UPDATE (đánh dấu đã đọc), gây bottleneck khi nhiều người chat cùng lúc. MongoDB ghi tuần tự nhanh hơn, schema linh hoạt hơn khi cấu trúc tin nhắn thay đổi.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ KỸ THUẬT NỔI BẬT ══════════════════════════ -->
+<div class="section section-white">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#f5f3ff">🎯</div>
+        Điểm kỹ thuật nổi bật
+      </div>
+      <div class="section-desc">
+        Những giải pháp kỹ thuật quan trọng và quyết định thiết kế đáng nêu khi trình bày.
+      </div>
+    </div>
+    <div class="kp-grid">
+      <div class="kp-card" style="border-top-color:#2563eb">
+        <h4>📐 Haversine Formula trong SQL</h4>
+        <p>Tính khoảng cách địa lý giữa 2 điểm GPS trực tiếp bằng SQL của MariaDB. Khi sinh viên bấm "Gần tôi", hệ thống lấy tọa độ GPS → truyền vào query → MariaDB tính khoảng cách cho từng phòng và sắp xếp theo gần-xa. Không cần xử lý ở tầng application, chỉ 1 query.</p>
+        <code>SELECT *, (6371 * acos(cos(lat1)*cos(lat2)*cos(lng2-lng1)+sin(lat1)*sin(lat2))) AS dist FROM rooms HAVING dist &lt; 5</code>
+      </div>
+      <div class="kp-card" style="border-top-color:#16a34a">
+        <h4>🔗 VNPay Webhook tự động cập nhật Room Status</h4>
+        <p>Khi thanh toán thành công, VNPay redirect về endpoint <code>/api/payments/vnpay-return</code>. Spring Boot xác minh chữ ký HMAC → cập nhật Payment.status = SUCCESS → tự động đổi Room.status = RENTED. Toàn bộ tự động, không cần thao tác thủ công.</p>
+        <code>Payment SUCCESS → Room AVAILABLE → RENTED</code>
+      </div>
+      <div class="kp-card" style="border-top-color:#7c3aed">
+        <h4>🤖 NLP Pipeline tiếng Việt</h4>
+        <p>Sinh viên gõ câu hỏi tự nhiên → AI Service gửi lên Gemini 2.5 Flash → trích xuất: địa danh, giá, loại phòng → Nominatim geocoding địa danh → tọa độ → gọi API Spring Boot → trả phòng phù hợp. Toàn bộ pipeline chạy trong vài giây.</p>
+        <code>"gần Bách Khoa" → lat: 10.772, lng: 106.658</code>
+      </div>
+      <div class="kp-card" style="border-top-color:#0891b2">
+        <h4>🔒 JWT Polyglot — Chia sẻ xác thực giữa 2 backend</h4>
+        <p>Spring Boot ký JWT bằng secret key HS512. Node.js Messaging Service dùng <em>chính secret key đó</em> để verify token mà không cần gọi API sang Spring Boot. Giảm độ trễ và loại bỏ điểm lỗi khi Spring Boot unavailable.</p>
+        <code>HS512 shared secret key → 2 service verify độc lập</code>
+      </div>
+      <div class="kp-card" style="border-top-color:#d97706">
+        <h4>🗺️ Miễn phí 100% — Leaflet + OpenStreetMap</h4>
+        <p>Thay thế Google Maps (cần thẻ ngân hàng, tính tiền sau 200$ free). Leaflet là thư viện bản đồ open-source, OpenStreetMap là dữ liệu bản đồ cộng đồng miễn phí. Nominatim geocoding cũng miễn phí. Tính năng tương đương Google Maps, cost = 0.</p>
+        <code>Leaflet + OSM + Nominatim = $0/tháng</code>
+      </div>
+      <div class="kp-card" style="border-top-color:#dc2626">
+        <h4>🔄 WebSocket qua Vite Proxy (tránh Mixed Content)</h4>
+        <p>Vite chạy HTTPS (basicSsl plugin). Nếu kết nối WebSocket trực tiếp đến <code>http://localhost:3001</code> → trình duyệt block (HTTPS page không thể kết nối HTTP WebSocket). Giải pháp: cấu hình Vite proxy <code>/socket.io</code> → <code>localhost:3001</code>, client kết nối qua proxy thay vì trực tiếp.</p>
+        <code>io('/') qua Vite proxy → không bị block HTTPS</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ DEPLOY ══════════════════════════════════ -->
+<div class="section section-gray">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="badge" style="background:#ecfeff">🐋</div>
+        Triển khai — Docker Compose
+      </div>
+      <div class="section-desc">
+        Toàn bộ hệ thống được đóng gói bằng Docker, khởi chạy tất cả 5 service + 2 database bằng 1 lệnh duy nhất.
+      </div>
+    </div>
+    <div style="background:#0f172a;border-radius:16px;padding:28px 32px;font-family:monospace;font-size:13.5px;line-height:1.8;color:#94a3b8;overflow-x:auto">
+<pre><span style="color:#64748b"># Khởi chạy toàn bộ hệ thống</span>
+<span style="color:#4ade80">docker-compose up -d</span>
+
+<span style="color:#64748b"># Các service được khởi chạy:</span>
+<span style="color:#60a5fa">✓</span> <span style="color:#fbbf24">spring-boot-api</span>     <span style="color:#94a3b8">→ port 8082  (Spring Boot backend)</span>
+<span style="color:#60a5fa">✓</span> <span style="color:#4ade80">nodejs-messaging</span>    <span style="color:#94a3b8">→ port 3001  (Socket.io chat)</span>
+<span style="color:#60a5fa">✓</span> <span style="color:#c084fc">ai-chat-service</span>     <span style="color:#94a3b8">→ port 3002  (Gemini AI)</span>
+<span style="color:#60a5fa">✓</span> <span style="color:#67e8f9">web-app</span>             <span style="color:#94a3b8">→ port 5173  (React frontend)</span>
+<span style="color:#60a5fa">✓</span> <span style="color:#60a5fa">mariadb</span>             <span style="color:#94a3b8">→ port 3306  (relational DB)</span>
+<span style="color:#60a5fa">✓</span> <span style="color:#4ade80">mongodb</span>             <span style="color:#94a3b8">→ port 27017 (document DB)</span>
+
+<span style="color:#64748b"># Mỗi service có Dockerfile riêng</span>
+<span style="color:#64748b"># Biến môi trường được cấu hình qua .env</span>
+<span style="color:#64748b"># GEMINI_API_KEY, DB_PASSWORD, JWT_SECRET...</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ FOOTER ══════════════════════════════════ -->
+<div class="footer">
+  <div style="font-size:2rem;margin-bottom:14px">🏠</div>
+  <div style="margin-bottom:6px;font-size:1rem"><strong>SmartAccommodationFinder</strong></div>
+  <div style="margin-bottom:14px;font-size:13px">Đồ án tốt nghiệp 2026 — Nền tảng tìm kiếm phòng trọ thông minh dành cho sinh viên</div>
+  <div style="font-size:12px;color:#475569">Spring Boot · Node.js · React · React Native · Gemini AI · VNPay · Leaflet + OpenStreetMap · Docker</div>
+</div>
+
+</body>
+</html>

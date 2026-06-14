@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Hướng dẫn bảo vệ đồ án — SAF Microservices</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.6;}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid #1e293b;padding:0 32px;background:#0f172a;position:sticky;top:0;z-index:100;}
+.tab{padding:16px 22px;cursor:pointer;font-size:13.5px;font-weight:600;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+.tab.active{color:#60a5fa;border-bottom-color:#60a5fa;}
+.tab:hover:not(.active){color:#94a3b8;}
+
+.page{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+.page.active{display:block;}
+
+h2{font-size:1.5rem;font-weight:800;margin-bottom:6px;}
+h3{font-size:1.1rem;font-weight:700;margin-bottom:10px;}
+p.desc{font-size:13.5px;color:#94a3b8;margin-bottom:24px;line-height:1.7;}
+
+/* BOXES */
+.box{border-radius:12px;padding:18px 22px;border:1px solid;margin-bottom:14px;}
+.green{background:#14532d;border-color:#22c55e;}
+.blue{background:#1e3a5f;border-color:#3b82f6;}
+.amber{background:#451a03;border-color:#f59e0b;}
+.purple{background:#3b0764;border-color:#a855f7;}
+.red{background:#450a0a;border-color:#ef4444;}
+.gray{background:#1e293b;border-color:#334155;}
+.cyan{background:#083344;border-color:#06b6d4;}
+.teal{background:#042f2e;border-color:#14b8a6;}
+
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;}
+.b-check{background:#14532d;color:#4ade80;}
+.b-cross{background:#450a0a;color:#f87171;}
+.b-warn{background:#451a03;color:#fbbf24;}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.mt{margin-top:16px;}
+.mb{margin-bottom:16px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;margin-bottom:20px;}
+.tbl th{background:#1e293b;padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;}
+.tbl td{padding:13px 16px;font-size:13.5px;border-bottom:1px solid #1e293b;vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.02);}
+
+/* Q&A */
+.qa-item{background:#1e293b;border-radius:14px;border:1px solid #334155;margin-bottom:18px;overflow:hidden;}
+.qa-q{background:#1e3a5f;padding:16px 20px;font-weight:700;font-size:14px;color:#93c5fd;display:flex;gap:10px;align-items:flex-start;}
+.qa-q .icon{background:#3b82f6;color:#fff;border-radius:8px;padding:2px 8px;font-size:11px;font-weight:800;white-space:nowrap;margin-top:1px;}
+.qa-a{padding:16px 20px;font-size:13.5px;color:#cbd5e1;line-height:1.75;}
+.qa-a strong{color:#4ade80;}
+.qa-tip{background:#042f2e;border-top:1px solid #14b8a6;padding:10px 20px;font-size:12px;color:#5eead4;}
+.qa-tip::before{content:"💡 Tip: ";}
+
+/* CODE */
+.code{background:#0a0f1a;border:1px solid #1e293b;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;overflow-x:auto;margin:10px 0;}
+.c1{color:#60a5fa;} .c2{color:#4ade80;} .c3{color:#fbbf24;} .c4{color:#c084fc;} .c5{color:#67e8f9;} .c6{color:#94a3b8;}
+
+/* ARCH DIAGRAM */
+.arch{background:#0a0f1a;border:1px solid #1e293b;border-radius:14px;padding:24px;font-family:'Courier New',monospace;font-size:13px;line-height:2.2;overflow-x:auto;}
+.arch .row{display:flex;align-items:center;gap:0;}
+.s-gw{color:#60a5fa;font-weight:700;}
+.s-spring{color:#f97316;font-weight:700;}
+.s-node{color:#4ade80;font-weight:700;}
+.s-ai{color:#c084fc;font-weight:700;}
+.s-web{color:#06b6d4;font-weight:700;}
+.s-mq{color:#fbbf24;font-weight:700;}
+.s-db{color:#94a3b8;}
+.s-gray{color:#475569;}
+.arrow{color:#334155;}
+
+/* PRINCIPLE LIST */
+.principle{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #1e293b;}
+.principle:last-child{border-bottom:none;}
+.p-num{background:#1e293b;color:#60a5fa;border-radius:8px;padding:4px 10px;font-weight:800;font-size:12px;white-space:nowrap;}
+.p-body{}
+.p-title{font-weight:700;font-size:14px;margin-bottom:3px;}
+.p-sub{font-size:12.5px;color:#94a3b8;}
+.p-saf{font-size:12.5px;color:#4ade80;margin-top:3px;}
+
+@media(max-width:650px){.grid-2,.grid-3{grid-template-columns:1fr;}.tabs{overflow-x:auto;}.page{padding:20px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" onclick="show(0)">🏗️ Kiến trúc SAF</div>
+  <div class="tab" onclick="show(1)">📊 So sánh với Monolithic</div>
+  <div class="tab" onclick="show(2)">❓ Câu hỏi giáo viên</div>
+  <div class="tab" onclick="show(3)">📋 6 Nguyên tắc cốt lõi</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 0 — KIẾN TRÚC SAF
+══════════════════════════════════════ -->
+<div class="page active" id="p0">
+  <h2>SAF đã là Microservices — không cần đổi sang Monolithic</h2>
+  <p class="desc">Microservices không có nghĩa là "mỗi domain nhỏ = 1 service". Định nghĩa đúng là <strong style="color:#60a5fa">hệ thống gồm nhiều service độc lập, có thể deploy riêng, giao tiếp qua API</strong>. SAF thỏa mãn đầy đủ định nghĩa này.</p>
+
+  <!-- DIAGRAM -->
+  <div class="arch mb">
+<pre style="margin:0;background:transparent;"><span class="s-gray">                         ┌──────────────────────────┐</span>
+<span class="s-gray">   Browser / Mobile ────▶│</span>  <span class="s-gw">API Gateway (Nginx)</span>       <span class="s-gray">│  ← Port 80 duy nhất</span>
+<span class="s-gray">                         └────────────┬─────────────┘</span>
+<span class="s-gray">                                      │ routes theo path</span>
+<span class="s-gray">              ┌───────────────────────┼────────────────────────┐</span>
+<span class="s-gray">              ▼                       ▼                        ▼</span>
+<span class="s-gray">   ┌──────────────────┐   ┌───────────────────┐   ┌──────────────────┐</span>
+<span class="s-gray">   │</span> <span class="s-spring">saf-core-api</span>      <span class="s-gray">│   │</span> <span class="s-node">saf-chat</span>           <span class="s-gray">│   │</span> <span class="s-ai">saf-ai-chat</span>       <span class="s-gray">│</span>
+<span class="s-gray">   │</span> <span class="c6">Java / Spring Boot</span><span class="s-gray">│   │</span> <span class="c6">Node.js + Socket.io</span><span class="s-gray">│   │</span> <span class="c6">Node.js + Gemini</span>  <span class="s-gray">│</span>
+<span class="s-gray">   │                  │   │                   │   │                  │</span>
+<span class="s-gray">   │</span> <span class="c6">Auth, Room,</span>       <span class="s-gray">│   │</span> <span class="c6">Chat real-time,</span>    <span class="s-gray">│   │</span> <span class="c6">Tìm phòng AI,</span>     <span class="s-gray">│</span>
+<span class="s-gray">   │</span> <span class="c6">Booking, Payment</span>  <span class="s-gray">│   │</span> <span class="c6">Notification push</span>  <span class="s-gray">│   │</span> <span class="c6">Gợi ý thông minh</span>  <span class="s-gray">│</span>
+<span class="s-gray">   └────────┬─────────┘   └────────┬──────────┘   └──────────────────┘</span>
+<span class="s-gray">            │ publish              │ consume</span>
+<span class="s-gray">            └──────────▶</span> <span class="s-mq">RabbitMQ</span> <span class="s-gray">◀─────────────────────────────┘</span>
+<span class="s-gray">                        </span><span class="s-mq">saf.booking exchange</span>
+<span class="s-gray">   ┌──────────────┐  ┌──────────────┐  ┌────────────┐  ┌──────────────┐</span>
+<span class="s-gray">   │</span>  <span class="s-db">MariaDB</span>      <span class="s-gray">│  │</span>  <span class="s-db">MongoDB</span>      <span class="s-gray">│  │</span>  <span class="s-db">Zipkin</span>    <span class="s-gray">│  │</span>  <span class="s-db">Resilience4j</span><span class="s-gray">│</span>
+<span class="s-gray">   │</span>  <span class="c6">Nghiệp vụ</span>    <span class="s-gray">│  │</span>  <span class="c6">Messages</span>    <span class="s-gray">│  │</span>  <span class="c6">Tracing</span>  <span class="s-gray">│  │</span>  <span class="c6">Circuit Bkr</span><span class="s-gray">│</span>
+<span class="s-gray">   └──────────────┘  └──────────────┘  └────────────┘  └──────────────┘</span></pre>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid-3 mb">
+    <div class="box green" style="text-align:center">
+      <div style="font-size:2.5rem;font-weight:800;color:#4ade80">5</div>
+      <div style="font-size:13px;color:#86efac">Services riêng biệt</div>
+      <div style="font-size:11px;color:#475569;margin-top:4px">Gateway · Spring · Node.js · AI · Web</div>
+    </div>
+    <div class="box blue" style="text-align:center">
+      <div style="font-size:2.5rem;font-weight:800;color:#60a5fa">2</div>
+      <div style="font-size:13px;color:#93c5fd">Ngôn ngữ backend</div>
+      <div style="font-size:11px;color:#475569;margin-top:4px">Java (Spring Boot) · JavaScript (Node.js)</div>
+    </div>
+    <div class="box cyan" style="text-align:center">
+      <div style="font-size:2.5rem;font-weight:800;color:#06b6d4">2</div>
+      <div style="font-size:13px;color:#67e8f9">Database riêng biệt</div>
+      <div style="font-size:11px;color:#475569;margin-top:4px">MariaDB (SQL) · MongoDB (NoSQL)</div>
+    </div>
+  </div>
+
+  <!-- KEY POINTS -->
+  <h3 style="color:#94a3b8;margin-bottom:12px">Tại sao ĐÂY LÀ Microservices</h3>
+  <div class="grid-2">
+    <div class="box teal">
+      <div style="font-weight:700;color:#2dd4bf;margin-bottom:8px">✅ Mỗi service deploy độc lập</div>
+      <div style="font-size:13px;color:#94a3b8">Restart Node.js không ảnh hưởng Spring Boot. RabbitMQ giữ message trong lúc service restart.</div>
+    </div>
+    <div class="box teal">
+      <div style="font-weight:700;color:#2dd4bf;margin-bottom:8px">✅ Polyglot — chọn tech phù hợp</div>
+      <div style="font-size:13px;color:#94a3b8">Spring Boot cho nghiệp vụ phức tạp. Node.js cho real-time Socket.io. Mỗi service dùng DB phù hợp nhất.</div>
+    </div>
+    <div class="box teal">
+      <div style="font-weight:700;color:#2dd4bf;margin-bottom:8px">✅ Giao tiếp qua API + Message Queue</div>
+      <div style="font-size:13px;color:#94a3b8">HTTP qua API Gateway. Async event qua RabbitMQ. Spring Boot không biết Node.js tồn tại — chỉ biết queue name.</div>
+    </div>
+    <div class="box teal">
+      <div style="font-weight:700;color:#2dd4fw;margin-bottom:8px">✅ Fault isolation</div>
+      <div style="font-size:13px;color:#94a3b8">AI Service chết → chat và booking vẫn chạy. Circuit Breaker ngăn cascade failure lan sang service khác.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 1 — SO SÁNH MONOLITHIC
+══════════════════════════════════════ -->
+<div class="page" id="p1">
+  <h2>SAF Microservices vs Monolithic — tại sao KHÔNG nên đổi</h2>
+  <p class="desc">Đổi về Monolithic là <strong style="color:#ef4444">đi thụt lùi</strong> — mất đi hết những gì đã xây dựng, và bài Monolithic đơn giản thì điểm không cao bằng.</p>
+
+  <table class="tbl">
+    <thead>
+      <tr><th>Tiêu chí</th><th>Monolithic (nếu đổi)</th><th>SAF Microservices (hiện tại)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Số service</strong></td>
+        <td>1 — tất cả trong 1 ứng dụng</td>
+        <td><span class="badge b-check">✅</span> 5 service riêng biệt</td>
+      </tr>
+      <tr>
+        <td><strong>Ngôn ngữ</strong></td>
+        <td>1 ngôn ngữ duy nhất</td>
+        <td><span class="badge b-check">✅</span> Java + JavaScript + React (Polyglot)</td>
+      </tr>
+      <tr>
+        <td><strong>Database</strong></td>
+        <td>1 DB chung cho tất cả</td>
+        <td><span class="badge b-check">✅</span> MariaDB (nghiệp vụ) + MongoDB (messaging)</td>
+      </tr>
+      <tr>
+        <td><strong>Real-time chat</strong></td>
+        <td>Khó — cần nhúng Socket.io vào monolith</td>
+        <td><span class="badge b-check">✅</span> Node.js service riêng, tối ưu cho event-loop</td>
+      </tr>
+      <tr>
+        <td><strong>AI tích hợp</strong></td>
+        <td>Cần gọi Gemini trong cùng process</td>
+        <td><span class="badge b-check">✅</span> ai-chat-service độc lập, scale riêng</td>
+      </tr>
+      <tr>
+        <td><strong>Deploy</strong></td>
+        <td>Deploy 1 lần = deploy tất cả</td>
+        <td><span class="badge b-check">✅</span> Deploy từng service độc lập, không downtime</td>
+      </tr>
+      <tr>
+        <td><strong>Lỗi 1 service</strong></td>
+        <td>1 lỗi = cả hệ thống sập</td>
+        <td><span class="badge b-check">✅</span> Fault isolation — service khác vẫn chạy</td>
+      </tr>
+      <tr>
+        <td><strong>Async notification</strong></td>
+        <td>Không có — phải sync</td>
+        <td><span class="badge b-check">✅</span> RabbitMQ event-driven</td>
+      </tr>
+      <tr>
+        <td><strong>Giải thích với GV</strong></td>
+        <td>Đơn giản nhưng điểm thấp hơn</td>
+        <td><span class="badge b-check">✅</span> Phức tạp hơn nhưng điểm cao hơn nhiều</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box amber">
+    <div style="font-weight:700;color:#fbbf24;margin-bottom:10px;font-size:15px">⚠️ Điều giáo viên muốn thấy ở bài Microservices</div>
+    <div class="grid-2" style="gap:10px">
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #451a03">
+        <div style="font-weight:700;font-size:13px;color:#fbbf24;margin-bottom:6px">Về kỹ thuật</div>
+        <ul style="font-size:12.5px;color:#94a3b8;padding-left:16px;line-height:2">
+          <li>Có bao nhiêu service? <strong style="color:#fbbf24">→ 5 service</strong></li>
+          <li>Giao tiếp thế nào? <strong style="color:#fbbf24">→ HTTP + RabbitMQ</strong></li>
+          <li>Database riêng không? <strong style="color:#fbbf24">→ MariaDB + MongoDB</strong></li>
+          <li>Deploy thế nào? <strong style="color:#fbbf24">→ Docker Compose</strong></li>
+        </ul>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #451a03">
+        <div style="font-weight:700;font-size:13px;color:#fbbf24;margin-bottom:6px">Về thiết kế</div>
+        <ul style="font-size:12.5px;color:#94a3b8;padding-left:16px;line-height:2">
+          <li>Tại sao chọn tech này? <strong style="color:#fbbf24">→ Polyglot</strong></li>
+          <li>Xử lý lỗi thế nào? <strong style="color:#fbbf24">→ Circuit Breaker</strong></li>
+          <li>Trace request thế nào? <strong style="color:#fbbf24">→ Zipkin</strong></li>
+          <li>Hướng phát triển? <strong style="color:#fbbf24">→ Tách Auth Service</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 2 — CÂU HỎI GIÁO VIÊN
+══════════════════════════════════════ -->
+<div class="page" id="p2">
+  <h2>Câu hỏi giáo viên hay hỏi — và cách trả lời</h2>
+  <p class="desc">Học thuộc các câu trả lời này. Trả lời ngắn gọn, tự tin, dùng đúng thuật ngữ kỹ thuật.</p>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q1</span> Bài này là Microservices hay Multi-service? Khác nhau thế nào?</div>
+    <div class="qa-a">
+      Bài này là <strong>Microservices</strong>. Sự khác biệt: Microservices mỗi service có trách nhiệm riêng, database riêng, có thể deploy độc lập, giao tiếp qua API. Multi-service chỉ đơn giản là chạy nhiều process không có nguyên tắc.<br><br>
+      SAF có 5 service riêng biệt — <strong>API Gateway</strong> (Nginx), <strong>Core API</strong> (Spring Boot), <strong>Messaging Service</strong> (Node.js), <strong>AI Service</strong> (Node.js), <strong>Web App</strong> (React/Nginx) — mỗi service có Dockerfile riêng, database riêng, deploy độc lập. Đây là Microservices.
+    </div>
+    <div class="qa-tip">Nhấn mạnh: "5 service, 2 ngôn ngữ, 2 database" — con số cụ thể luôn thuyết phục hơn lý thuyết chung chung.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q2</span> Tại sao Spring Boot xử lý nhiều domain (Auth, Room, Booking, Payment) trong 1 service?</div>
+    <div class="qa-a">
+      Đây là quyết định thiết kế có chủ ý. Room, Booking và Payment có quan hệ dữ liệu chặt chẽ và cần <strong>ACID transaction</strong> — ví dụ khi thanh toán thành công phải đổi trạng thái Booking và Room cùng lúc trong 1 transaction. Nếu tách ra thành service riêng, phải dùng <strong>Saga Pattern</strong> để xử lý distributed transaction — phức tạp hơn rất nhiều và dễ gây inconsistent data.<br><br>
+      Nguyên tắc thiết kế: <em>"Don't split services when they need to share transactions."</em> Đây không phải điểm yếu mà là lựa chọn đúng đắn cho bài toán này.<br><br>
+      <strong>Hướng phát triển tiếp theo:</strong> Tách Auth Service ra trước vì Auth không có transaction với các domain khác.
+    </div>
+    <div class="qa-tip">Nếu GV hỏi tiếp về Saga: "Saga Pattern chia transaction thành các bước nhỏ, mỗi bước có compensating action nếu thất bại — phức tạp hơn nhưng là giải pháp đúng cho distributed transaction."</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q3</span> Tại sao dùng cả Java lẫn Node.js? Không dùng 1 ngôn ngữ cho đơn giản?</div>
+    <div class="qa-a">
+      Đây là <strong>Polyglot Architecture</strong> — chọn công nghệ phù hợp với từng bài toán thay vì dùng 1 công nghệ cho tất cả.<br><br>
+      <strong>Spring Boot</strong> phù hợp cho nghiệp vụ phức tạp: JPA/Hibernate, transaction management, Spring Security, type-safe với Java.<br><br>
+      <strong>Node.js</strong> phù hợp cho real-time: event loop non-blocking xử lý hàng nghìn WebSocket connection hiệu quả hơn thread-based model của Java. Socket.io ecosystem trên Node.js cũng trưởng thành hơn.
+    </div>
+    <div class="qa-tip">Thêm: "Đây là lý do các công ty lớn như Netflix, Uber dùng Polyglot Microservices — mỗi team chọn tech stack tốt nhất cho bài toán của mình."</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q4</span> RabbitMQ dùng để làm gì? Tại sao không gọi HTTP trực tiếp?</div>
+    <div class="qa-a">
+      RabbitMQ là <strong>Message Queue</strong> — Spring Boot publish event vào queue, Node.js consume và push Socket.io cho client.<br><br>
+      <strong>Lý do không dùng HTTP trực tiếp:</strong><br>
+      • <em>Coupling:</em> Nếu gọi HTTP trực tiếp, Spring Boot phải biết URL của Node.js. Nếu Node.js đổi port hay scale → phải sửa Spring Boot.<br>
+      • <em>Resilience:</em> Nếu Node.js đang restart, HTTP call sẽ fail và throw exception trong luồng đặt lịch. Với RabbitMQ, message được giữ lại trong queue và tự deliver khi Node.js khởi động lại.<br>
+      • <em>Loose coupling:</em> Spring Boot không biết Node.js tồn tại, chỉ biết tên queue. Đây là đặc trưng quan trọng của Microservices.
+    </div>
+    <div class="qa-tip">Dùng ví dụ: "Giống như gửi thư qua bưu điện — người gửi không cần biết người nhận đang ở đâu hay có nhà không, bưu điện giữ thư và giao khi người nhận sẵn sàng."</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q5</span> Circuit Breaker là gì? Trong bài dùng ở đâu?</div>
+    <div class="qa-a">
+      <strong>Circuit Breaker</strong> là pattern ngăn cascade failure — khi một service lỗi liên tục, circuit "mở" và các request tiếp theo dùng fallback thay vì chờ timeout.<br><br>
+      Có 3 trạng thái: <strong>CLOSED</strong> (bình thường) → <strong>OPEN</strong> (sau 5 lần fail liên tiếp, block request 30s) → <strong>HALF-OPEN</strong> (thử 3 request xem service khỏe chưa).<br><br>
+      Trong SAF, dùng <strong>Resilience4j @CircuitBreaker</strong> bảo vệ:<br>
+      • <em>Notification publish:</em> Nếu RabbitMQ chết, chỉ log warning — luồng đặt lịch vẫn thành công.<br>
+      • <em>VNPay gateway:</em> Nếu cổng thanh toán không phản hồi, circuit mở và trả thông báo lỗi ngay thay vì chờ 30s timeout.
+    </div>
+    <div class="qa-tip">Ví dụ thực tế: "Netflix Hystrix (tiền thân của Resilience4j) được tạo ra vì 1 service chậm làm sập toàn bộ Netflix vào 2010."</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q6</span> Zipkin là gì? Tại sao cần Distributed Tracing?</div>
+    <div class="qa-a">
+      Trong Microservices, 1 request từ client có thể đi qua nhiều service: <em>Gateway → Spring Boot → RabbitMQ → Node.js</em>. Khi có bug, rất khó biết lỗi xảy ra ở service nào.<br><br>
+      <strong>Zipkin</strong> thu thập trace từ tất cả service, ghép lại thành timeline hoàn chỉnh của 1 request. Mỗi HTTP call được gắn <code>traceId</code> và <code>spanId</code> trong header — Zipkin dùng để vẽ sơ đồ.<br><br>
+      Trong SAF dùng <strong>Micrometer Tracing + Brave</strong> (Spring Boot 3.x) — tự động instrument mọi HTTP request, không cần viết thêm code.
+    </div>
+    <div class="qa-tip">Tại dev: mở http://localhost:9411 sau khi chạy docker-compose — thấy ngay timeline từng request. Cực kỳ ấn tượng khi demo.</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q7</span> API Gateway làm gì? Tại sao không để client gọi thẳng từng service?</div>
+    <div class="qa-a">
+      <strong>API Gateway</strong> (Nginx) là điểm vào duy nhất — client chỉ biết 1 địa chỉ <code>http://localhost</code>, không biết các service nội bộ.<br><br>
+      Nếu không có Gateway: client phải biết port của từng service (8082, 3001, 3002...) — lộ thông tin nội bộ, CORS phức tạp, không thể scale.<br><br>
+      Gateway xử lý: <strong>Request routing</strong> theo path (<code>/api/*</code> → Spring Boot, <code>/api/messages/*</code> → Node.js), <strong>WebSocket proxy</strong> cho Socket.io, <strong>SSL termination</strong>, <strong>Static file serving</strong> cho React SPA.
+    </div>
+    <div class="qa-tip">Nhấn mạnh: "Chỉ port 80 được lộ ra ngoài. Tất cả backend service dùng internal Docker network — không thể truy cập từ bên ngoài dù biết port."</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="icon">Q8</span> Nếu tiếp tục phát triển, bạn sẽ cải thiện gì?</div>
+    <div class="qa-a">
+      <strong>1. Tách Auth Service:</strong> Vì Auth không có transaction với các domain khác, đây là service dễ tách nhất. Auth Service riêng sẽ có database riêng với bảng users, otp_codes, refresh_tokens.<br><br>
+      <strong>2. Kubernetes thay Docker Compose:</strong> Auto-scale khi traffic tăng, self-healing khi pod crash, rolling deploy không downtime.<br><br>
+      <strong>3. ELK Stack:</strong> Tập trung log từ tất cả service vào Elasticsearch, visualize bằng Kibana — dễ debug hơn.<br><br>
+      <strong>4. Service Mesh (Istio):</strong> Quản lý mTLS giữa các service, traffic shaping, canary deployment tự động.
+    </div>
+    <div class="qa-tip">Trả lời câu này tốt cho thấy bạn hiểu big picture và có tư duy kiến trúc — điểm cộng lớn.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 3 — 6 NGUYÊN TẮC CỐT LÕI
+══════════════════════════════════════ -->
+<div class="page" id="p3">
+  <h2>6 Nguyên tắc cốt lõi — SAF đáp ứng thế nào</h2>
+  <p class="desc">Theo định nghĩa của Martin Fowler và Sam Newman (tác giả "Building Microservices"), đây là 6 đặc trưng quan trọng nhất.</p>
+
+  <div style="background:#1e293b;border-radius:14px;padding:20px;border:1px solid #334155;">
+
+    <div class="principle">
+      <div class="p-num">01</div>
+      <div class="p-body">
+        <div class="p-title">Single Responsibility</div>
+        <div class="p-sub">Mỗi service chỉ làm 1 việc — "Do one thing and do it well"</div>
+        <div class="p-saf">✅ Chat Service chỉ xử lý messaging · AI Service chỉ xử lý AI chat · Core API xử lý business logic</div>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">02</div>
+      <div class="p-body">
+        <div class="p-title">Decentralized Data Management (Database per Service)</div>
+        <div class="p-sub">Mỗi service sở hữu data của mình, không share database</div>
+        <div class="p-saf">✅ Core API → MariaDB (SQL, ACID transactions) · Messaging Service → MongoDB (document, flexible schema)</div>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">03</div>
+      <div class="p-body">
+        <div class="p-title">Independent Deployment</div>
+        <div class="p-sub">Mỗi service có thể build, test, deploy riêng mà không ảnh hưởng service khác</div>
+        <div class="p-saf">✅ Mỗi service có Dockerfile riêng · docker-compose restart service riêng lẻ · CI/CD pipeline độc lập</div>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">04</div>
+      <div class="p-body">
+        <div class="p-title">Design for Failure (Fault Tolerance)</div>
+        <div class="p-sub">Thiết kế giả định service khác có thể fail bất cứ lúc nào, không crash theo</div>
+        <div class="p-saf">✅ Resilience4j Circuit Breaker · RabbitMQ giữ message khi Node.js down · Health check + auto-restart · Retry logic trong Node.js RabbitMQ consumer</div>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">05</div>
+      <div class="p-body">
+        <div class="p-title">Smart Endpoints, Dumb Pipes</div>
+        <div class="p-sub">Logic nằm trong service, không nằm trong middleware. Giao tiếp qua REST hoặc Message Queue đơn giản</div>
+        <div class="p-saf">✅ Nginx chỉ route, không có business logic · RabbitMQ chỉ relay message · Mỗi service tự xử lý logic của mình</div>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="p-num">06</div>
+      <div class="p-body">
+        <div class="p-title">Infrastructure Automation</div>
+        <div class="p-sub">Containerization, CI/CD, health monitoring — không deploy thủ công</div>
+        <div class="p-saf">✅ Docker Compose với health check + condition: service_healthy · GitHub Actions CI/CD · Zipkin distributed tracing · Actuator /health endpoint</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="box green mt" style="margin-top:20px">
+    <div style="font-weight:700;color:#4ade80;font-size:15px;margin-bottom:10px">Kết luận</div>
+    <div style="font-size:13.5px;color:#86efac;line-height:1.9">
+      SAF đáp ứng <strong>đầy đủ 6 nguyên tắc cốt lõi</strong> của Microservices.<br>
+      Việc Spring Boot xử lý nhiều domain là <strong>quyết định kiến trúc hợp lý</strong> (tránh distributed transaction phức tạp), không phải điểm yếu.<br>
+      Đây là cách các công ty thực tế triển khai — không phải mọi domain đều cần service riêng, chỉ tách khi có lý do rõ ràng.
+    </div>
+  </div>
+
+  <!-- CHEAT SHEET -->
+  <div class="box gray mt" style="margin-top:16px">
+    <div style="font-weight:700;color:#94a3b8;margin-bottom:12px">📌 Cheat sheet — số liệu cần nhớ khi báo cáo</div>
+    <div class="grid-2" style="gap:8px;font-size:13px">
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Services:</span> 5 (Gateway, Spring, Node.js, AI, Web)</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Ngôn ngữ:</span> Java + JavaScript (Polyglot)</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Database:</span> MariaDB (SQL) + MongoDB (NoSQL)</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Message Queue:</span> RabbitMQ (saf.booking exchange)</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Circuit Breaker:</span> Resilience4j (notification + VNPay)</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Tracing:</span> Zipkin tại localhost:9411</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">Entry point:</span> Port 80 duy nhất (Nginx)</div>
+      <div style="background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155"><span style="color:#60a5fa">RabbitMQ UI:</span> localhost:15672 (saf / saf123)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.page').forEach((p,j)=>p.classList.toggle('active',i===j));
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+version: '3.8'
+
+# ══════════════════════════════════════════════════════════════
+#  SmartAccommodationFinder — Microservices Architecture
+#
+#  Single entry point: http://localhost (port 80 only)
+#
+#  Traffic flow:
+#    Client → api-gateway:80
+#               ├─ /                  → web-app:80
+#               ├─ /api/messages/*   → nodejs-messaging:3001
+#               ├─ /api/ai-chat/*    → ai-chat-service:3002
+#               ├─ /socket.io/*      → nodejs-messaging:3001
+#               ├─ /api/auth/**      → auth-service:8081
+#               ├─ /api/users/**     → auth-service:8081
+#               ├─ /api/upload/avatar|cover → auth-service:8081
+#               ├─ /api/rooms/**     → room-service:8082
+#               ├─ /api/reviews/**   → room-service:8082
+#               ├─ /api/favorites/** → room-service:8082
+#               ├─ /api/upload/room* → room-service:8082
+#               ├─ /api/bookings/**  → booking-service:8083
+#               ├─ /api/payments/**  → payment-service:8084
+#               └─ /api/admin/**     → booking-service:8083
+# ══════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Infrastructure ────────────────────────────────────────
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: saf-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: saf
+      RABBITMQ_DEFAULT_PASS: saf123
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mariadb-auth:
+    image: mariadb:10.11
+    container_name: saf-mariadb-auth
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: auth_db
+    volumes:
+      - mariadb-auth-data:/var/lib/mysql
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mariadb-room:
+    image: mariadb:10.11
+    container_name: saf-mariadb-room
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: room_db
+    volumes:
+      - mariadb-room-data:/var/lib/mysql
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mariadb-booking:
+    image: mariadb:10.11
+    container_name: saf-mariadb-booking
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: booking_db
+    volumes:
+      - mariadb-booking-data:/var/lib/mysql
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mariadb-payment:
+    image: mariadb:10.11
+    container_name: saf-mariadb-payment
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: payment_db
+    volumes:
+      - mariadb-payment-data:/var/lib/mysql
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mongodb:
+    image: mongo:6.0
+    container_name: saf-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ── Spring Boot Microservices (INTERNAL — no external ports) ──
+
+  auth-service:
+    build: ./backend/auth-service
+    container_name: saf-auth
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb-auth:3306/auth_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: saf
+      RABBITMQ_PASS: saf123
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY:-}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-saf-uploads}
+      AWS_REGION: ${AWS_REGION:-ap-southeast-1}
+    depends_on:
+      mariadb-auth:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  room-service:
+    build: ./backend/room-service
+    container_name: saf-room
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb-room:3306/room_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
+      AUTH_SERVICE_URL: http://auth-service:8081
+      BOOKING_SERVICE_URL: http://booking-service:8083
+      PAYMENT_SERVICE_URL: http://payment-service:8084
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY:-}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-saf-uploads}
+      AWS_REGION: ${AWS_REGION:-ap-southeast-1}
+    depends_on:
+      mariadb-room:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8082/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  booking-service:
+    build: ./backend/booking-service
+    container_name: saf-booking
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb-booking:3306/booking_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
+      AUTH_SERVICE_URL: http://auth-service:8081
+      ROOM_SERVICE_URL: http://room-service:8082
+      PAYMENT_SERVICE_URL: http://payment-service:8084
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: saf
+      RABBITMQ_PASS: saf123
+    depends_on:
+      mariadb-booking:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      room-service:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8083/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  payment-service:
+    build: ./backend/payment-service
+    container_name: saf-payment
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb-payment:3306/payment_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
+      AUTH_SERVICE_URL: http://auth-service:8081
+      BOOKING_SERVICE_URL: http://booking-service:8083
+      ROOM_SERVICE_URL: http://room-service:8082
+      VNPAY_TMN_CODE: ${VNPAY_TMN_CODE:-}
+      VNPAY_HASH_SECRET: ${VNPAY_HASH_SECRET:-}
+      VNPAY_URL: ${VNPAY_URL:-https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+      VNPAY_RETURN_URL: http://localhost/api/payments/vnpay-return
+    depends_on:
+      mariadb-payment:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      booking-service:
+        condition: service_healthy
+      room-service:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8084/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  notification-service:
+    build: ./backend/notification-service
+    container_name: saf-notification
+    restart: unless-stopped
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: saf
+      RABBITMQ_PASS: saf123
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      AUTH_SERVICE_URL: http://auth-service:8081
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8085/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  nodejs-messaging:
+    build: ./backend/nodejs-service
+    container_name: saf-messaging
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/messaging_db
+      PORT: 3001
+      NODE_ENV: production
+      SPRING_BOOT_URL: http://auth-service:8081
+      JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
+      CORS_ORIGIN: http://localhost,http://localhost:80
+      RABBITMQ_URI: amqp://saf:saf123@rabbitmq:5672
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  ai-chat-service:
+    build: ./backend/ai-chat-service
+    container_name: saf-ai-chat
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/ai_chat_db
+      PORT: 3002
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SPRING_BOOT_URL: http://auth-service:8081
+      CORS_ORIGIN: http://localhost,http://localhost:80
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3002/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ── Frontend ──────────────────────────────────────────────
+
+  web-app:
+    build: ./frontend/web-app
+    container_name: saf-web
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+      - nodejs-messaging
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── API Gateway — Single Entry Point ─────────────────────
+
+  api-gateway:
+    image: nginx:alpine
+    container_name: saf-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/api-gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      room-service:
+        condition: service_healthy
+      booking-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      nodejs-messaging:
+        condition: service_healthy
+      ai-chat-service:
+        condition: service_healthy
+      web-app:
+        condition: service_healthy
+    networks:
+      - saf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/gateway/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mariadb-auth-data:
+  mariadb-room-data:
+  mariadb-booking-data:
+  mariadb-payment-data:
+  mongodb-data:
+  rabbitmq-data:
+
+networks:
+  saf-network:
+    driver: bridge

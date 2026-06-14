@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Microservices Architecture — Chuẩn vs SAF</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',system-ui,sans-serif; background:#0f172a; color:#e2e8f0; }
+
+/* ── TABS ── */
+.tabs { display:flex; gap:0; border-bottom:2px solid #1e293b; padding:0 32px; background:#0f172a; position:sticky; top:0; z-index:100; }
+.tab { padding:16px 24px; cursor:pointer; font-size:14px; font-weight:600; color:#64748b; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; white-space:nowrap; }
+.tab.active { color:#60a5fa; border-bottom-color:#60a5fa; }
+.tab:hover:not(.active) { color:#94a3b8; }
+
+.page { display:none; padding:32px; }
+.page.active { display:block; }
+
+/* ── DIAGRAM CONTAINERS ── */
+.diagram { background:#0f172a; }
+.section-label {
+  font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:#475569; margin-bottom:10px; padding-left:4px;
+}
+
+/* ── BOXES ── */
+.box {
+  border-radius:12px; padding:14px 18px; font-size:13px;
+  border:1px solid; position:relative;
+}
+.box-title { font-weight:700; font-size:14px; margin-bottom:4px; }
+.box-sub { font-size:11.5px; opacity:.75; line-height:1.5; }
+
+/* Colors */
+.blue   { background:#1e3a5f; border-color:#3b82f6; }
+.green  { background:#14532d; border-color:#22c55e; }
+.purple { background:#3b0764; border-color:#a855f7; }
+.amber  { background:#451a03; border-color:#f59e0b; }
+.red    { background:#450a0a; border-color:#ef4444; }
+.gray   { background:#1e293b; border-color:#475569; }
+.cyan   { background:#083344; border-color:#06b6d4; }
+.pink   { background:#4a044e; border-color:#ec4899; }
+.teal   { background:#042f2e; border-color:#14b8a6; }
+.orange { background:#431407; border-color:#f97316; }
+
+/* LAYERS */
+.layer {
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+  background:rgba(255,255,255,.02);
+}
+.layer-title {
+  font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  padding:4px 12px; border-radius:999px; display:inline-block; margin-bottom:14px;
+}
+
+.row { display:flex; gap:12px; flex-wrap:wrap; }
+.row-center { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+
+/* ARROW */
+.arrow {
+  text-align:center; color:#334155; font-size:20px; margin:8px 0;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.arrow-label { font-size:11px; color:#475569; }
+
+/* BADGE */
+.badge {
+  display:inline-block; font-size:10px; font-weight:700;
+  padding:2px 7px; border-radius:999px; margin-left:6px;
+}
+.b-check { background:#14532d; color:#4ade80; }
+.b-cross { background:#450a0a; color:#f87171; }
+.b-warn  { background:#451a03; color:#fbbf24; }
+
+/* PRINCIPLE TABLE */
+.principle-table { width:100%; border-collapse:collapse; margin-top:12px; }
+.principle-table th {
+  background:#1e293b; padding:10px 14px; text-align:left;
+  font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;
+}
+.principle-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid #1e293b; vertical-align:top; }
+.principle-table tr:last-child td { border-bottom:none; }
+.principle-table tr:hover td { background:rgba(255,255,255,.02); }
+
+/* COMPARISON */
+.compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.compare-col { background:#1e293b; border-radius:14px; padding:20px; border:1px solid #334155; }
+.compare-col h3 { font-size:14px; font-weight:700; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #334155; }
+
+/* CODE BLOCK */
+.code-box {
+  background:#0a0f1a; border:1px solid #1e293b; border-radius:10px;
+  padding:16px; font-family:'Courier New',monospace; font-size:12px;
+  line-height:1.8; overflow-x:auto; margin-top:10px;
+}
+.c1 { color:#60a5fa; } .c2 { color:#4ade80; } .c3 { color:#fbbf24; }
+.c4 { color:#c084fc; } .c5 { color:#67e8f9; } .c6 { color:#94a3b8; }
+
+/* PIPE LINE */
+.pipe { display:flex; align-items:center; gap:0; flex-wrap:wrap; }
+.pipe-box {
+  padding:8px 14px; border-radius:8px; font-size:12px; font-weight:600;
+  border:1px solid; white-space:nowrap;
+}
+.pipe-arrow { color:#334155; padding:0 6px; font-size:16px; }
+
+/* STATUS ICON */
+.si { font-size:16px; margin-right:6px; }
+
+/* GRID helpers */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+
+.mt { margin-top:16px; }
+.mb { margin-bottom:16px; }
+h2 { font-size:1.4rem; font-weight:800; margin-bottom:6px; }
+p.desc { font-size:13.5px; color:#94a3b8; margin-bottom:20px; line-height:1.6; }
+
+@media(max-width:700px){
+  .grid-2,.grid-3,.grid-4,.compare-grid{ grid-template-columns:1fr; }
+  .tabs { overflow-x:auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" onclick="show(0)">📐 Chuẩn Microservices</div>
+  <div class="tab" onclick="show(1)">🔄 Luồng giao tiếp</div>
+  <div class="tab" onclick="show(2)">🏗️ SAF so với chuẩn</div>
+  <div class="tab" onclick="show(3)">📋 12 Nguyên tắc</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 0 — CHUẨN MICROSERVICES
+════════════════════════════════════════════════════════ -->
+<div class="page active" id="p0">
+  <h2>Kiến trúc Microservices chuẩn</h2>
+  <p class="desc">Mô hình đầy đủ của một hệ thống Microservices theo tiêu chuẩn ngành — từ client đến database.</p>
+
+  <!-- CLIENT -->
+  <div class="layer">
+    <span class="layer-title" style="background:#1e293b;color:#94a3b8">① Clients</span>
+    <div class="row">
+      <div class="box gray" style="flex:1;min-width:120px"><div class="box-title">🌐 Web Browser</div><div class="box-sub">React / Angular / Vue</div></div>
+      <div class="box gray" style="flex:1;min-width:120px"><div class="box-title">📱 Mobile App</div><div class="box-sub">React Native / Flutter</div></div>
+      <div class="box gray" style="flex:1;min-width:120px"><div class="box-title">🔌 Third-party</div><div class="box-sub">External APIs / Partners</div></div>
+    </div>
+  </div>
+
+  <div class="arrow">↓ HTTPS / WSS (TLS)<div class="arrow-label">Tất cả traffic qua 1 điểm</div></div>
+
+  <!-- API GATEWAY -->
+  <div class="layer">
+    <span class="layer-title" style="background:#1e3a5f;color:#60a5fa">② API Gateway — Điểm vào duy nhất</span>
+    <div class="box blue" style="margin-bottom:12px">
+      <div class="box-title">🔀 API Gateway <span style="font-size:11px;color:#94a3b8;font-weight:400">(Nginx / Kong / Spring Cloud Gateway)</span></div>
+      <div class="row mt" style="gap:8px">
+        <span style="background:#0f172a;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;font-size:11.5px">🔐 Authentication</span>
+        <span style="background:#0f172a;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;font-size:11.5px">⚡ Rate Limiting</span>
+        <span style="background:#0f172a;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;font-size:11.5px">🔄 Load Balancing</span>
+        <span style="background:#0f172a;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;font-size:11.5px">📊 Request Routing</span>
+        <span style="background:#0f172a;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;font-size:11.5px">🔒 SSL Termination</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓ Internal HTTP / gRPC<div class="arrow-label">Service Discovery qua tên (Consul/Eureka/DNS)</div></div>
+
+  <!-- SERVICES -->
+  <div class="layer">
+    <span class="layer-title" style="background:#14532d;color:#4ade80">③ Microservices — Mỗi service 1 trách nhiệm</span>
+    <div class="grid-4" style="margin-bottom:12px">
+      <div class="box green"><div class="box-title">👤 Auth Service</div><div class="box-sub">Đăng ký, đăng nhập, JWT, OAuth2</div></div>
+      <div class="box green"><div class="box-title">👤 User Service</div><div class="box-sub">Hồ sơ, cài đặt, upload ảnh</div></div>
+      <div class="box green"><div class="box-title">🏠 Room Service</div><div class="box-sub">CRUD phòng, tìm kiếm, lọc, bản đồ</div></div>
+      <div class="box green"><div class="box-title">📅 Booking Service</div><div class="box-sub">Đặt lịch, xác nhận, hủy</div></div>
+      <div class="box green"><div class="box-title">💳 Payment Service</div><div class="box-sub">VNPay, xử lý giao dịch</div></div>
+      <div class="box green"><div class="box-title">⭐ Review Service</div><div class="box-sub">Đánh giá, tính điểm trung bình</div></div>
+      <div class="box green"><div class="box-title">💬 Messaging Service</div><div class="box-sub">Chat real-time, Socket.io</div></div>
+      <div class="box green"><div class="box-title">🤖 AI Service</div><div class="box-sub">Gợi ý, tìm kiếm tự nhiên</div></div>
+    </div>
+  </div>
+
+  <div class="arrow">↓ Publish / Subscribe (Async)<div class="arrow-label">Tách coupling — service không gọi trực tiếp nhau</div></div>
+
+  <!-- MESSAGE BROKER -->
+  <div class="layer">
+    <span class="layer-title" style="background:#451a03;color:#fbbf24">④ Message Broker — Giao tiếp bất đồng bộ</span>
+    <div class="box amber">
+      <div class="box-title">📨 Message Queue <span style="font-size:11px;color:#94a3b8;font-weight:400">(Kafka / RabbitMQ)</span></div>
+      <div class="row mt" style="gap:8px">
+        <span style="background:#0f172a;border:1px solid #f59e0b;border-radius:8px;padding:5px 10px;font-size:11.5px">booking.confirmed → Payment</span>
+        <span style="background:#0f172a;border:1px solid #f59e0b;border-radius:8px;padding:5px 10px;font-size:11.5px">payment.success → Room</span>
+        <span style="background:#0f172a;border:1px solid #f59e0b;border-radius:8px;padding:5px 10px;font-size:11.5px">booking.new → Notification</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATABASES -->
+  <div class="layer">
+    <span class="layer-title" style="background:#083344;color:#06b6d4">⑤ Database per Service — Mỗi service 1 DB riêng</span>
+    <div class="grid-4">
+      <div class="box cyan"><div class="box-title">🔵 Auth DB</div><div class="box-sub">MySQL — users, tokens</div></div>
+      <div class="box cyan"><div class="box-title">🔵 Room DB</div><div class="box-sub">PostgreSQL — rooms, images</div></div>
+      <div class="box cyan"><div class="box-title">🔵 Booking DB</div><div class="box-sub">MySQL — bookings, schedules</div></div>
+      <div class="box cyan"><div class="box-title">🟢 Messaging DB</div><div class="box-sub">MongoDB — messages, chats</div></div>
+    </div>
+  </div>
+
+  <!-- SUPPORTING INFRA -->
+  <div class="layer">
+    <span class="layer-title" style="background:#3b0764;color:#c084fc">⑥ Supporting Infrastructure</span>
+    <div class="grid-4">
+      <div class="box purple"><div class="box-title">🔍 Service Registry</div><div class="box-sub">Consul / Eureka — services tự đăng ký & tìm nhau</div></div>
+      <div class="box purple"><div class="box-title">⚙️ Config Server</div><div class="box-sub">Spring Cloud Config — config tập trung, không hardcode</div></div>
+      <div class="box purple"><div class="box-title">🔒 Circuit Breaker</div><div class="box-sub">Resilience4j — cô lập lỗi, fallback tự động</div></div>
+      <div class="box purple"><div class="box-title">📊 Distributed Tracing</div><div class="box-sub">Jaeger / Zipkin — theo dõi request qua nhiều service</div></div>
+      <div class="box purple"><div class="box-title">📝 Centralized Logging</div><div class="box-sub">ELK Stack — log tập trung từ tất cả service</div></div>
+      <div class="box purple"><div class="box-title">📈 Monitoring</div><div class="box-sub">Prometheus + Grafana — metrics & alerting</div></div>
+      <div class="box purple"><div class="box-title">🚢 Container Orchestration</div><div class="box-sub">Kubernetes — tự scale, self-healing</div></div>
+      <div class="box purple"><div class="box-title">🔄 CI/CD Pipeline</div><div class="box-sub">GitHub Actions — deploy độc lập từng service</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 1 — LUỒNG GIAO TIẾP
+════════════════════════════════════════════════════════ -->
+<div class="page" id="p1">
+  <h2>Luồng giao tiếp trong Microservices</h2>
+  <p class="desc">Microservices có 2 kiểu giao tiếp: đồng bộ (sync) và bất đồng bộ (async). Dùng đúng kiểu cho đúng tình huống.</p>
+
+  <!-- SYNC -->
+  <div class="layer" style="margin-bottom:24px">
+    <span class="layer-title" style="background:#1e3a5f;color:#60a5fa">Giao tiếp đồng bộ (Synchronous) — dùng khi cần kết quả ngay</span>
+    <p style="font-size:13px;color:#94a3b8;margin-bottom:14px">Client gọi → đợi → nhận kết quả. Dùng cho: query data, login, hiển thị UI.</p>
+
+    <div style="margin-bottom:16px">
+      <div class="section-label">REST API (HTTP/HTTPS)</div>
+      <div class="pipe">
+        <div class="pipe-box blue">Client</div>
+        <div class="pipe-arrow">──GET /api/rooms──→</div>
+        <div class="pipe-box blue">API Gateway</div>
+        <div class="pipe-arrow">──→</div>
+        <div class="pipe-box green">Room Service</div>
+        <div class="pipe-arrow">──→</div>
+        <div class="pipe-box cyan">Room DB</div>
+        <div class="pipe-arrow">←── data ──────────────────</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div class="section-label">gRPC (Protocol Buffers) — nhanh hơn REST ~7x cho inter-service</div>
+      <div class="pipe">
+        <div class="pipe-box green">Booking Service</div>
+        <div class="pipe-arrow">──gRPC──→</div>
+        <div class="pipe-box green">Room Service</div>
+        <div class="pipe-arrow">(kiểm tra phòng còn trống?)</div>
+        <div class="pipe-arrow">←── bool ──</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">WebSocket — real-time bidirectional</div>
+      <div class="pipe">
+        <div class="pipe-box blue">Browser</div>
+        <div class="pipe-arrow">══ WS ══</div>
+        <div class="pipe-box green">Messaging Service</div>
+        <div class="pipe-arrow">⇄ push/receive instantly</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASYNC -->
+  <div class="layer" style="margin-bottom:24px">
+    <span class="layer-title" style="background:#451a03;color:#fbbf24">Giao tiếp bất đồng bộ (Asynchronous) — dùng khi không cần kết quả ngay</span>
+    <p style="font-size:13px;color:#94a3b8;margin-bottom:14px">Service publish event → không đợi. Subscriber xử lý khi có thể. Dùng cho: notification, email, cập nhật trạng thái.</p>
+
+    <div class="code-box">
+<span class="c3">// Khi booking được xác nhận — Booking Service KHÔNG gọi trực tiếp các service khác</span>
+<span class="c2">Booking Service</span>  <span class="c6">──publish──→</span>  <span class="c3">Kafka: "booking.confirmed"</span>  <span class="c6">{ bookingId, roomId, studentId }</span>
+
+<span class="c6">                                 └──subscribe──→</span>  <span class="c5">Payment Service</span>   <span class="c6">// tạo link thanh toán</span>
+<span class="c6">                                 └──subscribe──→</span>  <span class="c4">Notification Service</span>  <span class="c6">// gửi email/push notification</span>
+<span class="c6">                                 └──subscribe──→</span>  <span class="c2">Messaging Service</span>   <span class="c6">// gửi tin nhắn hệ thống</span>
+
+<span class="c3">// Khi thanh toán thành công</span>
+<span class="c5">Payment Service</span>  <span class="c6">──publish──→</span>  <span class="c3">Kafka: "payment.success"</span>
+<span class="c6">                                 └──subscribe──→</span>  <span class="c2">Room Service</span>   <span class="c6">// đổi status → RENTED</span>
+<span class="c6">                                 └──subscribe──→</span>  <span class="c4">Notification Service</span>  <span class="c6">// thông báo sinh viên</span>
+    </div>
+
+    <div class="box amber mt">
+      <div class="box-title">💡 Lợi ích của Async (Event-Driven)</div>
+      <div class="grid-3 mt" style="gap:8px">
+        <div style="font-size:12.5px;color:#fbbf24;background:#0f172a;padding:10px;border-radius:8px;border:1px solid #451a03"><strong>Loose coupling</strong><br/><span style="color:#94a3b8">Service không biết nhau tồn tại, chỉ biết event</span></div>
+        <div style="font-size:12.5px;color:#fbbf24;background:#0f172a;padding:10px;border-radius:8px;border:1px solid #451a03"><strong>Resilience</strong><br/><span style="color:#94a3b8">Notification Service chết, Payment vẫn chạy bình thường</span></div>
+        <div style="font-size:12.5px;color:#fbbf24;background:#0f172a;padding:10px;border-radius:8px;border:1px solid #451a03"><strong>Scalability</strong><br/><span style="color:#94a3b8">Thêm subscriber mới mà không sửa publisher</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICE DISCOVERY -->
+  <div class="layer">
+    <span class="layer-title" style="background:#3b0764;color:#c084fc">Service Discovery — Services tìm nhau thế nào?</span>
+    <div class="compare-grid">
+      <div>
+        <div class="section-label" style="color:#ef4444">❌ Hardcode (sai)</div>
+        <div class="code-box">
+<span class="c6">// Cứng URL — khi scale hoặc đổi IP là vỡ</span>
+<span class="c1">fetch</span>(<span class="c3">"http://192.168.1.10:8082/api/rooms"</span>)
+<span class="c1">fetch</span>(<span class="c3">"http://localhost:3001/api/messages"</span>)
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="color:#4ade80">✅ Service Discovery (đúng)</div>
+        <div class="code-box">
+<span class="c6">// Dùng tên service — Consul/DNS tự resolve IP</span>
+<span class="c1">fetch</span>(<span class="c3">"http://room-service/api/rooms"</span>)
+<span class="c6">// Consul: "room-service" → 10.0.1.5:8082</span>
+<span class="c6">//                       → 10.0.1.6:8082  (nếu scale x2)</span>
+        </div>
+      </div>
+    </div>
+    <div class="box purple mt">
+      <strong style="color:#c084fc">SAF dùng Docker DNS</strong> — các service gọi nhau qua tên container
+      (<code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-size:12px">http://spring-boot-api:8082</code>,
+      <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-size:12px">http://nodejs-messaging:3001</code>)
+      — đây là Service Discovery đơn giản, đủ dùng cho scale nhỏ.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 2 — SAF SO VỚI CHUẨN
+════════════════════════════════════════════════════════ -->
+<div class="page" id="p2">
+  <h2>SAF so với chuẩn Microservices</h2>
+  <p class="desc">Đánh giá thực tế — cái nào đã đạt, cái nào đang thiếu, cái nào không cần thiết cho phạm vi đồ án.</p>
+
+  <table class="principle-table">
+    <thead>
+      <tr>
+        <th>Tiêu chí</th>
+        <th>Chuẩn Microservices</th>
+        <th>SAF hiện tại</th>
+        <th>Mức độ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>API Gateway</strong></td>
+        <td>Nginx / Kong / Spring Cloud Gateway</td>
+        <td>Nginx (nginx/api-gateway.conf) — port 80 duy nhất</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Single Entry Point</strong></td>
+        <td>Chỉ 1 port lộ ra ngoài</td>
+        <td>Port 80 (gateway). Backend internal-only</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Service Isolation</strong></td>
+        <td>Service không share code, không share DB</td>
+        <td>Tách rõ: Spring Boot / Node.js / AI — DB riêng</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Polyglot Persistence</strong></td>
+        <td>Mỗi service chọn DB phù hợp</td>
+        <td>MariaDB (nghiệp vụ) + MongoDB (messaging)</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Service Discovery</strong></td>
+        <td>Consul / Eureka / Kubernetes DNS</td>
+        <td>Docker DNS (tên container)</td>
+        <td><span class="badge b-warn">⚠️ Cơ bản</span></td>
+      </tr>
+      <tr>
+        <td><strong>Health Check</strong></td>
+        <td>Mỗi service có /health, orchestrator tự kiểm tra</td>
+        <td>Có /health + docker-compose healthcheck</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Independent Deploy</strong></td>
+        <td>Mỗi service có Dockerfile riêng, deploy độc lập</td>
+        <td>Có Dockerfile riêng + docker-compose</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Auth chia sẻ</strong></td>
+        <td>JWT shared secret hoặc OAuth2 / Identity Server</td>
+        <td>JWT HS512 shared giữa Spring Boot và Node.js</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Tách nhỏ service</strong></td>
+        <td>Mỗi domain = 1 service (Auth/Room/Booking/Payment riêng)</td>
+        <td>Spring Boot gộp domain; services tách biệt hoàn toàn qua RabbitMQ (không còn HTTP coupling)</td>
+        <td><span class="badge b-warn">⚠️ Tách qua MQ</span></td>
+      </tr>
+      <tr>
+        <td><strong>Message Queue</strong></td>
+        <td>Kafka / RabbitMQ — async event-driven</td>
+        <td>RabbitMQ — Spring Boot publish, Node.js consume → Socket.io push</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Circuit Breaker</strong></td>
+        <td>Resilience4j — tự fallback khi service lỗi</td>
+        <td>@CircuitBreaker bảo vệ notification publish + VNPay gateway</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Distributed Tracing</strong></td>
+        <td>Jaeger / Zipkin — theo dõi request qua nhiều service</td>
+        <td>Zipkin (port 9411) + Micrometer — auto-instrument mọi HTTP call</td>
+        <td><span class="badge b-check">✅ Đạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>Centralized Logging</strong></td>
+        <td>ELK Stack — log tập trung</td>
+        <td>Log riêng từng container (docker logs)</td>
+        <td><span class="badge b-warn">⚠️ Cơ bản</span></td>
+      </tr>
+      <tr>
+        <td><strong>Container Orchestration</strong></td>
+        <td>Kubernetes — auto-scale, self-healing</td>
+        <td>Docker Compose — đủ cho phạm vi đồ án</td>
+        <td><span class="badge b-warn">⚠️ Docker Compose</span></td>
+      </tr>
+      <tr>
+        <td><strong>CI/CD Pipeline</strong></td>
+        <td>GitHub Actions / Jenkins — auto deploy</td>
+        <td>Có GitHub Actions workflow (.github/workflows)</td>
+        <td><span class="badge b-check">✅ Có</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid-3 mt" style="margin-top:24px">
+    <div class="box green">
+      <div class="box-title" style="color:#4ade80">✅ Đã đạt — 11 tiêu chí</div>
+      <div class="box-sub mt">API Gateway, Single Entry Point, Service Isolation, Polyglot Persistence, Health Check, Independent Deploy, JWT Auth, CI/CD, Message Queue (RabbitMQ), Circuit Breaker (Resilience4j), Distributed Tracing (Zipkin)</div>
+    </div>
+    <div class="box amber">
+      <div class="box-title" style="color:#fbbf24">⚠️ Cơ bản — 4 tiêu chí</div>
+      <div class="box-sub mt">Service Discovery (Docker DNS thay Consul), Logging (docker logs thay ELK), Spring Boot chưa tách domain riêng, Docker Compose thay vì Kubernetes</div>
+    </div>
+    <div class="box red">
+      <div class="box-title" style="color:#f87171">❌ Chưa có — 3 tiêu chí</div>
+      <div class="box-sub mt">Message Queue (Kafka), Circuit Breaker (Resilience4j), Distributed Tracing (Jaeger)</div>
+      <div class="box-sub" style="margin-top:8px;color:#475569">→ Phù hợp để nói "hướng phát triển tiếp theo" khi báo cáo</div>
+    </div>
+  </div>
+
+  <div class="box teal mt" style="margin-top:20px;border-color:#14b8a6;background:#042f2e">
+    <div class="box-title" style="color:#2dd4bf;margin-bottom:8px">🔄 Luồng thông báo — Trước vs Sau khi thêm RabbitMQ</div>
+    <div class="compare-grid" style="gap:12px">
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #ef4444">
+        <div style="font-size:11px;font-weight:700;color:#f87171;margin-bottom:8px">❌ TRƯỚC (HTTP coupling)</div>
+        <div style="font-family:monospace;font-size:12px;color:#94a3b8;line-height:2">
+          Spring Boot<br/>
+          → HTTP POST /internal/notify<br/>
+          → nodejs-messaging<br/>
+          → Socket.io emit<br/>
+          <span style="color:#ef4444;font-size:11px">⚠ Nếu Node.js chết → exception trong Spring Boot</span>
+        </div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #14b8a6">
+        <div style="font-size:11px;font-weight:700;color:#2dd4bf;margin-bottom:8px">✅ SAU (RabbitMQ async)</div>
+        <div style="font-family:monospace;font-size:12px;color:#94a3b8;line-height:2">
+          Spring Boot<br/>
+          → RabbitMQ publish "saf.booking"<br/>
+          → nodejs-messaging consume<br/>
+          → Socket.io emit<br/>
+          <span style="color:#2dd4bf;font-size:11px">✅ Node.js chết → RabbitMQ giữ message, tự retry</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 3 — 12 NGUYÊN TẮC
+════════════════════════════════════════════════════════ -->
+<div class="page" id="p3">
+  <h2>12 Nguyên tắc Microservices</h2>
+  <p class="desc">Dựa theo "The Twelve-Factor App" + các nguyên tắc Microservices của Martin Fowler. Đây là nền tảng lý thuyết để đánh giá kiến trúc.</p>
+
+  <table class="principle-table">
+    <thead>
+      <tr><th>#</th><th>Nguyên tắc</th><th>Ý nghĩa</th><th>SAF</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:#64748b;font-weight:700">1</td>
+        <td><strong>Single Responsibility</strong></td>
+        <td>Mỗi service chỉ làm 1 việc. "Do one thing and do it well."</td>
+        <td><span class="badge b-warn">⚠️ Node.js/AI đạt, Spring Boot chưa tách</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">2</td>
+        <td><strong>Database per Service</strong></td>
+        <td>Mỗi service có DB riêng, không share DB với service khác.</td>
+        <td><span class="badge b-check">✅ MariaDB (Spring) / MongoDB (Node.js)</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">3</td>
+        <td><strong>API Gateway</strong></td>
+        <td>Một điểm vào duy nhất, xử lý auth, routing, rate limit.</td>
+        <td><span class="badge b-check">✅ Nginx api-gateway</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">4</td>
+        <td><strong>Service Discovery</strong></td>
+        <td>Services tự tìm nhau qua registry, không hardcode IP/port.</td>
+        <td><span class="badge b-warn">⚠️ Docker DNS (đơn giản)</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">5</td>
+        <td><strong>Loose Coupling</strong></td>
+        <td>Service A không biết implementation của Service B. Chỉ biết API.</td>
+        <td><span class="badge b-check">✅ Spring Boot → RabbitMQ → Node.js (zero HTTP coupling)</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">6</td>
+        <td><strong>High Cohesion</strong></td>
+        <td>Code liên quan đến cùng domain nằm trong cùng service.</td>
+        <td><span class="badge b-check">✅ Chat code riêng, AI riêng</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">7</td>
+        <td><strong>Fault Tolerance</strong></td>
+        <td>Circuit Breaker — lỗi 1 service không lan sang service khác.</td>
+        <td><span class="badge b-check">✅ Resilience4j @CircuitBreaker trên notification + VNPay</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">8</td>
+        <td><strong>Containerization</strong></td>
+        <td>Mỗi service đóng gói trong Docker, chạy độc lập ở bất kỳ đâu.</td>
+        <td><span class="badge b-check">✅ Dockerfile riêng cho mỗi service</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">9</td>
+        <td><strong>Externalized Config</strong></td>
+        <td>Cấu hình qua biến môi trường (.env), không hardcode trong code.</td>
+        <td><span class="badge b-check">✅ Docker env vars, .env file</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">10</td>
+        <td><strong>Observability</strong></td>
+        <td>Logging, Metrics, Tracing — biết hệ thống đang làm gì.</td>
+        <td><span class="badge b-warn">⚠️ /health có, Tracing chưa</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">11</td>
+        <td><strong>Independent Deployment</strong></td>
+        <td>Deploy 1 service không ảnh hưởng service khác, không downtime.</td>
+        <td><span class="badge b-check">✅ Docker Compose service restart riêng</span></td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:700">12</td>
+        <td><strong>Decentralized Data Management</strong></td>
+        <td>Mỗi service quyết định cách lưu data của mình (SQL/NoSQL/Cache).</td>
+        <td><span class="badge b-check">✅ Polyglot persistence</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- NEXT STEPS -->
+  <div class="box amber mt" style="margin-top:24px">
+    <div class="box-title" style="color:#fbbf24;margin-bottom:12px">🚀 Hướng phát triển tiếp theo (nếu được hỏi)</div>
+    <div class="grid-3" style="gap:10px">
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #451a03">
+        <div style="font-weight:700;color:#fbbf24;margin-bottom:6px">Tách Spring Boot</div>
+        <div style="font-size:12px;color:#94a3b8">Chia thành Auth Service + Room Service + Booking Service + Payment Service — mỗi service 1 database riêng</div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #451a03">
+        <div style="font-weight:700;color:#fbbf24;margin-bottom:6px">Thêm Kafka</div>
+        <div style="font-size:12px;color:#94a3b8">Booking confirmed → event → Payment Service tự động xử lý. Không cần gọi HTTP trực tiếp, giảm coupling</div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #451a03">
+        <div style="font-weight:700;color:#fbbf24;margin-bottom:6px">Kubernetes</div>
+        <div style="font-size:12px;color:#94a3b8">Tự scale khi traffic tăng, self-healing khi pod crash, rolling deploy không downtime</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i) {
+  document.querySelectorAll('.page').forEach((p,j) => p.classList.toggle('active', i===j));
+  document.querySelectorAll('.tab').forEach((t,j) => t.classList.toggle('active', i===j));
+}
+</script>
+</body>
+</html>

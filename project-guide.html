@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SAF — Hướng dẫn dự án</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+  header{background:linear-gradient(135deg,#1e40af,#7c3aed);padding:28px 40px;display:flex;align-items:center;gap:16px}
+  header h1{font-size:1.8rem;font-weight:800;color:#fff}
+  header p{color:#bfdbfe;font-size:.95rem;margin-top:4px}
+  .badge{background:rgba(255,255,255,.15);color:#fff;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid rgba(255,255,255,.3)}
+  nav{display:flex;gap:4px;padding:16px 40px;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto}
+  nav button{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;white-space:nowrap;transition:all .2s;background:transparent;color:#94a3b8}
+  nav button.active{background:#3b82f6;color:#fff}
+  nav button:hover:not(.active){background:#334155;color:#e2e8f0}
+  .tab{display:none;padding:32px 40px;max-width:1100px;margin:0 auto}
+  .tab.active{display:block}
+  h2{font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+  h3{font-size:1rem;font-weight:700;color:#93c5fd;margin:20px 0 10px}
+  p{color:#cbd5e1;line-height:1.7;margin-bottom:10px}
+
+  /* Cards */
+  .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:16px}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+  .service-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px}
+  .service-card .icon{font-size:1.8rem;margin-bottom:10px}
+  .service-card h4{font-weight:700;color:#f1f5f9;margin-bottom:6px}
+  .service-card p{font-size:.85rem;color:#94a3b8;margin:0}
+  .service-card .port{display:inline-block;background:#0f172a;color:#60a5fa;padding:2px 8px;border-radius:6px;font-size:.75rem;font-family:monospace;margin-top:8px;border:1px solid #1d4ed8}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.88rem}
+  th{background:#1e3a5f;color:#93c5fd;padding:10px 14px;text-align:left;font-weight:600}
+  td{padding:10px 14px;border-bottom:1px solid #1e293b;color:#cbd5e1;vertical-align:top}
+  tr:hover td{background:#1e293b}
+  td:first-child{font-weight:600;color:#f1f5f9;white-space:nowrap}
+
+  /* Code */
+  pre{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.82rem;color:#86efac;overflow-x:auto;margin-bottom:16px}
+  code{background:#1e293b;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.85rem;color:#86efac}
+
+  /* Tags */
+  .tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin:2px}
+  .tag.green{background:#052e16;color:#4ade80;border:1px solid #166534}
+  .tag.blue{background:#0c1a3a;color:#60a5fa;border:1px solid #1e40af}
+  .tag.yellow{background:#1c1108;color:#fbbf24;border:1px solid #78350f}
+  .tag.red{background:#1c0505;color:#f87171;border:1px solid #7f1d1d}
+  .tag.purple{background:#13082a;color:#c084fc;border:1px solid #4c1d95}
+
+  /* Alert */
+  .alert{border-radius:10px;padding:14px 18px;margin-bottom:16px;border-left:4px solid}
+  .alert.info{background:#0c1a3a;border-color:#3b82f6;color:#93c5fd}
+  .alert.success{background:#052e16;border-color:#22c55e;color:#86efac}
+  .alert.warn{background:#1c1108;border-color:#f59e0b;color:#fcd34d}
+  .alert.danger{background:#1c0505;border-color:#ef4444;color:#fca5a5}
+
+  /* Step */
+  .steps{counter-reset:step}
+  .step{display:flex;gap:16px;margin-bottom:20px;counter-increment:step}
+  .step-num{width:36px;height:36px;border-radius:50%;background:#1d4ed8;color:#fff;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .step-num::before{content:counter(step)}
+  .step-body h4{font-weight:700;color:#f1f5f9;margin-bottom:6px}
+  .step-body p{font-size:.87rem;color:#94a3b8;margin:0}
+
+  /* Q&A */
+  .qa{margin-bottom:16px}
+  .qa-q{background:#162032;border-left:3px solid #3b82f6;padding:10px 16px;border-radius:0 8px 8px 0;color:#93c5fd;font-weight:600;margin-bottom:6px}
+  .qa-a{background:#1e293b;padding:12px 16px;border-radius:8px;color:#cbd5e1;font-size:.9rem;line-height:1.7}
+
+  /* Flow */
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0;font-size:.85rem}
+  .flow-box{background:#1e3a5f;color:#93c5fd;padding:6px 14px;border-radius:8px;font-weight:600;border:1px solid #1d4ed8}
+  .flow-arrow{color:#475569;font-size:1.1rem}
+  .flow-box.green{background:#052e16;color:#4ade80;border-color:#166534}
+  .flow-box.purple{background:#13082a;color:#c084fc;border-color:#4c1d95}
+  .flow-box.orange{background:#1c1108;color:#fb923c;border-color:#78350f}
+
+  /* Divider */
+  hr{border:none;border-top:1px solid #334155;margin:24px 0}
+
+  /* URL link */
+  a{color:#60a5fa;text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* Checklist */
+  .check{list-style:none;padding:0}
+  .check li{padding:6px 0;color:#cbd5e1;font-size:.9rem}
+  .check li::before{content:'✅ ';font-size:.85rem}
+  .check li.warn::before{content:'⚠️ '}
+  .check li.no::before{content:'❌ '}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏠 SmartAccommodationFinder</h1>
+    <p>Hướng dẫn toàn bộ dự án — kiến trúc, cách chạy, các thay đổi, câu hỏi bảo vệ</p>
+  </div>
+  <span class="badge">v1.0 — Microservices</span>
+</header>
+
+<nav>
+  <button class="active" onclick="show('run')">🚀 Cách chạy</button>
+  <button onclick="show('arch')">🏗️ Kiến trúc</button>
+  <button onclick="show('services')">📦 Các service</button>
+  <button onclick="show('changes')">🔧 Đã thay đổi</button>
+  <button onclick="show('micro')">⚙️ Microservices</button>
+  <button onclick="show('qa')">❓ Câu hỏi GV</button>
+</nav>
+
+<!-- ═══════════════════════════ TAB: RUN ═══════════════════════════ -->
+<div id="tab-run" class="tab active">
+  <h2>🚀 Cách chạy dự án</h2>
+
+  <div class="alert success">Hiện tại tất cả 9 container đang chạy. Vào thẳng <strong><a href="http://localhost">http://localhost</a></strong> là dùng được.</div>
+
+  <h3>Chạy lần đầu / sau khi tắt máy</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Mở PowerShell tại thư mục dự án</h4>
+        <p>Nhấn chuột phải vào thư mục <code>SmartAccommodationFinder</code> → <em>Open in Terminal</em></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Chạy lệnh duy nhất</h4>
+        <pre>docker-compose up -d</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Chờ ~1–2 phút</h4>
+        <p>Spring Boot cần ~25 giây để khởi động, sau đó API Gateway mới bật. Kiểm tra tình trạng:</p>
+        <pre>docker-compose ps</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Mở trình duyệt</h4>
+        <p>Vào <a href="http://localhost"><strong>http://localhost</strong></a> — xong!</p>
+      </div>
+    </div>
+  </div>
+
+  <hr/>
+  <h3>Tắt dự án</h3>
+  <pre>docker-compose down</pre>
+
+  <h3>Rebuild sau khi sửa code</h3>
+  <pre># Rebuild tất cả
+docker-compose up -d --build
+
+# Rebuild 1 service cụ thể (nhanh hơn)
+docker-compose up -d --build spring-boot-api
+docker-compose up -d --build nodejs-messaging
+docker-compose up -d --build web-app</pre>
+
+  <h3>Xem log khi có lỗi</h3>
+  <pre># Xem tất cả (Ctrl+C để thoát)
+docker-compose logs -f
+
+# Xem từng service
+docker-compose logs -f spring-boot-api
+docker-compose logs -f nodejs-messaging
+docker-compose logs -f ai-chat-service</pre>
+
+  <hr/>
+  <h3>Tất cả URL có thể truy cập</h3>
+  <table>
+    <tr><th>URL</th><th>Là gì</th><th>Ghi chú</th></tr>
+    <tr><td><a href="http://localhost">http://localhost</a></td><td>Web app (React)</td><td>Ứng dụng chính cho người dùng</td></tr>
+    <tr><td><a href="http://localhost:8082/swagger-ui.html">localhost:8082/swagger-ui.html</a></td><td>Swagger UI</td><td>Tài liệu & test API Spring Boot</td></tr>
+    <tr><td><a href="http://localhost:9411">localhost:9411</a></td><td>Zipkin</td><td>Distributed Tracing — xem trace request</td></tr>
+    <tr><td><a href="http://localhost:15672">localhost:15672</a></td><td>RabbitMQ Management</td><td>Login: <code>saf</code> / <code>saf123</code></td></tr>
+    <tr><td><a href="http://localhost:3307">localhost:3307</a></td><td>MariaDB</td><td>Dùng HeidiSQL / DBeaver để kết nối</td></tr>
+    <tr><td><a href="http://localhost:27017">localhost:27017</a></td><td>MongoDB</td><td>Dùng MongoDB Compass để xem</td></tr>
+  </table>
+
+  <div class="alert info">💡 Tại sao URL chính không có port? <br/>Trước: <code>localhost:5173</code> — Vite dev server chạy trực tiếp trên máy.<br/>Bây giờ: <code>localhost</code> (tức :80) — Docker Compose + Nginx gateway, port 80 là port mặc định HTTP nên trình duyệt tự ẩn đi.</div>
+</div>
+
+<!-- ═══════════════════════════ TAB: ARCH ═══════════════════════════ -->
+<div id="tab-arch" class="tab">
+  <h2>🏗️ Kiến trúc hệ thống</h2>
+
+  <div class="alert info">SAF là hệ thống <strong>Polyglot Microservices</strong> — nhiều ngôn ngữ, nhiều database, giao tiếp qua API Gateway và Message Queue.</div>
+
+  <h3>Luồng request từ người dùng</h3>
+  <div class="flow">
+    <div class="flow-box">Trình duyệt</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Nginx API Gateway :80</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box green">Web App (React)</div>
+  </div>
+  <div class="flow">
+    <div class="flow-box">API call /api/*</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Nginx Gateway</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box orange">Spring Boot :8082</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">MariaDB</div>
+  </div>
+  <div class="flow">
+    <div class="flow-box">Chat /api/messages/*</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Nginx Gateway</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box purple">Node.js :3001</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">MongoDB</div>
+  </div>
+
+  <h3>Luồng thông báo realtime (Async qua RabbitMQ)</h3>
+  <div class="flow">
+    <div class="flow-box orange">Spring Boot</div>
+    <div class="flow-arrow">publish →</div>
+    <div class="flow-box" style="background:#2d1810;color:#fb923c;border-color:#92400e">RabbitMQ Exchange</div>
+    <div class="flow-arrow">consume →</div>
+    <div class="flow-box purple">Node.js</div>
+    <div class="flow-arrow">socket.io →</div>
+    <div class="flow-box green">Trình duyệt</div>
+  </div>
+
+  <h3>Sơ đồ kiến trúc tổng thể</h3>
+  <pre style="color:#94a3b8">
+┌─────────────────────────────────────────────────────────┐
+│                   CLIENT (Browser)                       │
+└──────────────────────────┬──────────────────────────────┘
+                           │ HTTP / WebSocket
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│              Nginx API Gateway  (:80)                    │
+│   /          → web-app (React SPA)                      │
+│   /api/*     → spring-boot-api (:8082)                  │
+│   /api/messages/* → nodejs-messaging (:3001)            │
+│   /api/ai-chat/*  → ai-chat-service (:3002)             │
+│   /socket.io/*    → nodejs-messaging (:3001)            │
+└───┬──────────────┬──────────────┬───────────────────────┘
+    │              │              │
+    ▼              ▼              ▼
+┌────────┐  ┌──────────┐  ┌──────────────┐
+│ React  │  │Spring Boot│  │  Node.js     │
+│  SPA   │  │  :8082   │  │ Messaging    │
+│(nginx) │  │(Java/JPA)│  │  :3001       │
+└────────┘  └────┬─────┘  └──────┬───────┘
+                 │               │
+          ┌──────┼──────┐   ┌────┴──────┐
+          ▼      ▼      ▼   ▼           ▼
+       MariaDB  MQ   Zipkin MongoDB  RabbitMQ
+                                    (consume)
+  ┌───────────────────────────────────────────┐
+  │           AI Chat Service :3002           │
+  │         (Node.js + Gemini API)            │
+  └───────────────────────────────────────────┘</pre>
+
+  <h3>5 Microservice chính</h3>
+  <table>
+    <tr><th>#</th><th>Service</th><th>Ngôn ngữ</th><th>Database</th><th>Vai trò</th></tr>
+    <tr><td>1</td><td>spring-boot-api</td><td>Java 17</td><td>MariaDB</td><td>Auth, phòng, booking, payment, user</td></tr>
+    <tr><td>2</td><td>nodejs-messaging</td><td>Node.js 18</td><td>MongoDB</td><td>Chat realtime, WebSocket, notification</td></tr>
+    <tr><td>3</td><td>ai-chat-service</td><td>Node.js 18</td><td>MongoDB</td><td>AI chatbot tìm phòng (Gemini)</td></tr>
+    <tr><td>4</td><td>web-app</td><td>React/TS</td><td>—</td><td>Giao diện người dùng (SPA)</td></tr>
+    <tr><td>5</td><td>api-gateway</td><td>Nginx</td><td>—</td><td>Single entry point, load balance, routing</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════ TAB: SERVICES ═══════════════════════════ -->
+<div id="tab-services" class="tab">
+  <h2>📦 Chi tiết các service & container</h2>
+
+  <div class="card-grid">
+    <div class="service-card">
+      <div class="icon">⚙️</div>
+      <h4>spring-boot-api</h4>
+      <p>Core backend: xác thực JWT, quản lý phòng, booking, thanh toán VNPay, gửi email OTP. Dùng Resilience4j Circuit Breaker và Zipkin Tracing.</p>
+      <span class="port">:8082</span>
+      <span class="port">Java 17 + Spring Boot 3.3</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">💬</div>
+      <h4>nodejs-messaging</h4>
+      <p>Chat realtime Socket.IO, lưu lịch sử tin nhắn MongoDB, consume RabbitMQ để đẩy thông báo booking đến người dùng.</p>
+      <span class="port">:3001</span>
+      <span class="port">Node.js 18 + Express</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🤖</div>
+      <h4>ai-chat-service</h4>
+      <p>AI chatbot tư vấn tìm phòng, tích hợp Google Gemini 2.5 Flash, lưu lịch sử hội thoại MongoDB.</p>
+      <span class="port">:3002</span>
+      <span class="port">Node.js 18 + Gemini API</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🌐</div>
+      <h4>web-app</h4>
+      <p>Single Page Application React + TypeScript + Vite. Build thành file tĩnh, serve qua Nginx.</p>
+      <span class="port">:80 (nội bộ)</span>
+      <span class="port">React 18 + TypeScript</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🔀</div>
+      <h4>api-gateway (Nginx)</h4>
+      <p>Điểm vào duy nhất toàn hệ thống. Routing theo path prefix, WebSocket proxy, serve static files.</p>
+      <span class="port">:80 (public)</span>
+      <span class="port">Nginx Alpine</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🐰</div>
+      <h4>RabbitMQ</h4>
+      <p>Message broker. Exchange: <code>saf.booking</code> (topic). Queue: <code>saf.notification.queue</code>. Spring Boot publish → Node.js consume.</p>
+      <span class="port">:5672 (AMQP)</span>
+      <span class="port">:15672 (Management UI)</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🔍</div>
+      <h4>Zipkin</h4>
+      <p>Distributed Tracing. Tự động thu thập trace từ Spring Boot qua Micrometer. Xem tại localhost:9411.</p>
+      <span class="port">:9411</span>
+      <span class="port">openzipkin/zipkin:3</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🗄️</div>
+      <h4>MariaDB</h4>
+      <p>Database quan hệ cho Spring Boot: users, rooms, bookings, payments, reviews, favorites. Dùng JPA/Hibernate.</p>
+      <span class="port">:3307 (dev access)</span>
+      <span class="port">MariaDB 10.11</span>
+    </div>
+    <div class="service-card">
+      <div class="icon">🍃</div>
+      <h4>MongoDB</h4>
+      <p>Database NoSQL cho Node.js: messages, conversations, AI chat history. Dùng Mongoose ODM.</p>
+      <span class="port">:27017</span>
+      <span class="port">MongoDB 6.0</span>
+    </div>
+  </div>
+
+  <h3>Kiểm tra tình trạng tất cả container</h3>
+  <pre>docker-compose ps</pre>
+  <p>Tất cả phải có status <span class="tag green">(healthy)</span>. Nếu có service <span class="tag red">(unhealthy)</span> hoặc <span class="tag yellow">(starting)</span>, chờ thêm 1 phút rồi kiểm tra lại.</p>
+</div>
+
+<!-- ═══════════════════════════ TAB: CHANGES ═══════════════════════════ -->
+<div id="tab-changes" class="tab">
+  <h2>🔧 Những gì đã được thay đổi</h2>
+
+  <div class="alert warn">Đây là tóm tắt toàn bộ thay đổi so với code gốc ban đầu. Dùng để giải thích với giáo viên khi cần.</div>
+
+  <h3>1. Thêm RabbitMQ — Async Messaging</h3>
+  <div class="card">
+    <p><strong>Vấn đề cũ:</strong> Spring Boot gọi trực tiếp HTTP sang Node.js để gửi thông báo → 2 service phụ thuộc chặt vào nhau (tight coupling).</p>
+    <p><strong>Giải pháp:</strong> Dùng RabbitMQ làm trung gian. Spring Boot publish message vào exchange, Node.js consume message và đẩy thông báo realtime qua Socket.IO.</p>
+    <table>
+      <tr><th>File đã sửa</th><th>Thay đổi</th></tr>
+      <tr><td>backend/spring-boot-api/pom.xml</td><td>Thêm dependency <code>spring-boot-starter-amqp</code></td></tr>
+      <tr><td>backend/spring-boot-api/.../config/RabbitMQConfig.java</td><td>File mới — cấu hình Exchange, Queue, Binding</td></tr>
+      <tr><td>backend/spring-boot-api/.../services/NotificationService.java</td><td>Viết lại — dùng AmqpTemplate thay vì HTTP call</td></tr>
+      <tr><td>backend/nodejs-service/src/server.js</td><td>Thêm <code>connectRabbitMQ()</code> — consume queue, emit socket</td></tr>
+      <tr><td>backend/nodejs-service/package.json</td><td>Thêm <code>amqplib</code></td></tr>
+      <tr><td>docker-compose.yml</td><td>Thêm service <code>rabbitmq</code></td></tr>
+    </table>
+  </div>
+
+  <h3>2. Thêm Circuit Breaker — Resilience4j</h3>
+  <div class="card">
+    <p><strong>Vấn đề:</strong> Nếu RabbitMQ hoặc VNPay bị lỗi, toàn bộ request booking/thanh toán sẽ fail theo.</p>
+    <p><strong>Giải pháp:</strong> Annotation <code>@CircuitBreaker</code> bảo vệ các method quan trọng — khi lỗi quá nhiều, circuit mở ra và chạy fallback (ghi log, không crash).</p>
+    <table>
+      <tr><th>File đã sửa</th><th>Thay đổi</th></tr>
+      <tr><td>pom.xml</td><td>Thêm <code>spring-cloud-starter-circuitbreaker-resilience4j</code>, Spring Cloud BOM 2023.0.3</td></tr>
+      <tr><td>NotificationService.java</td><td><code>@CircuitBreaker(name="notification", fallbackMethod="notifyFallback")</code></td></tr>
+      <tr><td>application.properties</td><td>Cấu hình threshold, window size, wait duration cho 2 circuit breaker</td></tr>
+    </table>
+  </div>
+
+  <h3>3. Thêm Distributed Tracing — Zipkin</h3>
+  <div class="card">
+    <p><strong>Là gì:</strong> Tự động theo dõi mỗi request đi qua Spring Boot mất bao lâu, ở bước nào. Không cần viết thêm code.</p>
+    <table>
+      <tr><th>File đã sửa</th><th>Thay đổi</th></tr>
+      <tr><td>pom.xml</td><td>Thêm <code>micrometer-tracing-bridge-brave</code>, <code>zipkin-reporter-brave</code></td></tr>
+      <tr><td>application.properties</td><td>Thêm <code>management.tracing.sampling.probability=1.0</code> và Zipkin URL</td></tr>
+      <tr><td>docker-compose.yml</td><td>Thêm service <code>zipkin</code></td></tr>
+    </table>
+  </div>
+
+  <h3>4. Fix Spring Security — Cho phép Actuator</h3>
+  <div class="card">
+    <p><strong>Vấn đề:</strong> Spring Security chặn <code>/actuator/health</code> (trả 401) nên Docker không thể health check được, container không bao giờ healthy.</p>
+    <table>
+      <tr><th>File đã sửa</th><th>Thay đổi</th></tr>
+      <tr><td>SecurityConfig.java</td><td>Thêm <code>.requestMatchers("/actuator/**").permitAll()</code></td></tr>
+    </table>
+  </div>
+
+  <h3>5. Fix TypeScript Build Errors — Web App</h3>
+  <div class="card">
+    <table>
+      <tr><th>File</th><th>Lỗi</th><th>Fix</th></tr>
+      <tr><td>tsconfig.app.json</td><td>noUnusedLocals/Params: true</td><td>Đổi thành false</td></tr>
+      <tr><td>MainLayout.tsx</td><td><code>toggleDark</code> không tồn tại</td><td>Đổi thành <code>toggleTheme</code></td></tr>
+      <tr><td>MyRooms.tsx</td><td><code>s.confirm</code> không tồn tại</td><td>Đổi thành <code>s.showConfirm</code>, refactor handleDelete</td></tr>
+      <tr><td>SettingsModal.tsx</td><td>Import <code>chatStore</code>, <code>ProfileModal</code> không tồn tại</td><td>Xóa 2 import + xóa clearChat() + xóa render ProfileModal</td></tr>
+      <tr><td>ComparePage.tsx</td><td>JSX namespace not found</td><td>Thêm <code>import type &#123; JSX &#125; from 'react'</code></td></tr>
+    </table>
+  </div>
+
+  <h3>6. Fix Docker Health Checks</h3>
+  <div class="card">
+    <table>
+      <tr><th>Vấn đề</th><th>Fix</th></tr>
+      <tr><td>Tất cả health check dùng <code>curl</code> nhưng Alpine Linux không có curl</td><td>Đổi toàn bộ sang <code>wget --spider</code></td></tr>
+      <tr><td>Nginx health check dùng <code>localhost</code> — Alpine resolve thành IPv6 (::1) nhưng nginx chỉ listen IPv4</td><td>Đổi thành <code>127.0.0.1</code></td></tr>
+      <tr><td>Zipkin image không có curl</td><td>Đổi sang <code>wget --spider</code></td></tr>
+    </table>
+  </div>
+
+  <h3>7. Fix Docker Build — Node.js Lock File</h3>
+  <div class="card">
+    <table>
+      <tr><th>File</th><th>Vấn đề</th><th>Fix</th></tr>
+      <tr><td>backend/nodejs-service/Dockerfile</td><td><code>npm ci</code> fail vì amqplib chưa có trong lock file</td><td>Đổi thành <code>npm install --omit=dev</code></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TAB: MICRO ═══════════════════════════ -->
+<div id="tab-micro" class="tab">
+  <h2>⚙️ Tiêu chí Microservices đã đạt</h2>
+
+  <div class="alert success">SAF đạt <strong>11/12</strong> tiêu chí Microservices chuẩn công nghiệp.</div>
+
+  <table>
+    <tr><th>Tiêu chí</th><th>Trạng thái</th><th>Bằng chứng</th></tr>
+    <tr><td>Single Responsibility</td><td><span class="tag green">✅ Đạt</span></td><td>Mỗi service 1 domain: auth/room, chat, AI, UI, gateway</td></tr>
+    <tr><td>Independent Deployment</td><td><span class="tag green">✅ Đạt</span></td><td>Mỗi service có Dockerfile riêng, build độc lập</td></tr>
+    <tr><td>Decentralized Data</td><td><span class="tag green">✅ Đạt</span></td><td>Spring Boot → MariaDB, Node.js → MongoDB (2 DB khác nhau)</td></tr>
+    <tr><td>API Gateway</td><td><span class="tag green">✅ Đạt</span></td><td>Nginx route /api/*, /socket.io/*, /api/ai-chat/*</td></tr>
+    <tr><td>Polyglot</td><td><span class="tag green">✅ Đạt</span></td><td>Java + Node.js + React TypeScript (3 ngôn ngữ/platform)</td></tr>
+    <tr><td>Message Queue</td><td><span class="tag green">✅ Đạt</span></td><td>RabbitMQ Topic Exchange — Spring Boot publish, Node.js consume</td></tr>
+    <tr><td>Circuit Breaker</td><td><span class="tag green">✅ Đạt</span></td><td>Resilience4j @CircuitBreaker trên NotificationService + VNPay</td></tr>
+    <tr><td>Distributed Tracing</td><td><span class="tag green">✅ Đạt</span></td><td>Micrometer + Zipkin — xem trace tại localhost:9411</td></tr>
+    <tr><td>Health Check</td><td><span class="tag green">✅ Đạt</span></td><td>Docker healthcheck + Spring Boot Actuator /health</td></tr>
+    <tr><td>Containerized</td><td><span class="tag green">✅ Đạt</span></td><td>Docker Compose orchestrate 9 container</td></tr>
+    <tr><td>Service Discovery</td><td><span class="tag green">✅ Đạt</span></td><td>Docker internal DNS (tên service = hostname)</td></tr>
+    <tr><td>Tách nhỏ Spring Boot</td><td><span class="tag yellow">⚠️ Một phần</span></td><td>Đã tách qua MQ, chưa tách thành Auth/Room/Booking riêng</td></tr>
+  </table>
+
+  <h3>RabbitMQ — Luồng hoạt động chi tiết</h3>
+  <pre style="color:#94a3b8">
+1. Student đặt phòng → BookingController.create()
+   ↓
+2. Spring Boot confirm booking
+   ↓
+3. NotificationService.notify(landlordId, "BOOKING_CREATED", ...)
+   ↓  [@CircuitBreaker bảo vệ]
+4. amqpTemplate.convertAndSend("saf.booking", "booking.BOOKING_CREATED", payload)
+   ↓  [RabbitMQ Topic Exchange]
+5. Queue "saf.notification.queue" nhận message
+   ↓  [Node.js consumer]
+6. channel.consume() → parse JSON → io.to("user_123").emit("notification", data)
+   ↓  [Socket.IO]
+7. Trình duyệt landlord nhận thông báo realtime 🔔</pre>
+
+  <h3>Circuit Breaker — Khi nào kích hoạt</h3>
+  <pre style="color:#94a3b8">
+Cấu hình notification circuit breaker:
+  - sliding-window-size: 10 request gần nhất
+  - failure-rate-threshold: 50% (≥5 lỗi → mở circuit)
+  - wait-duration-in-open-state: 30s (sau 30s thử lại)
+
+Trạng thái:
+  CLOSED → bình thường, mọi call đi qua
+  OPEN   → lỗi quá nhiều, chạy fallback (ghi log WARNING)
+  HALF_OPEN → thử lại sau 30s, nếu OK → CLOSED lại
+
+Kết quả: booking vẫn thành công dù RabbitMQ bị lỗi</pre>
+</div>
+
+<!-- ═══════════════════════════ TAB: Q&A ═══════════════════════════ -->
+<div id="tab-qa" class="tab">
+  <h2>❓ Câu hỏi giáo viên hay hỏi</h2>
+
+  <div class="qa">
+    <div class="qa-q">Dự án anh dùng kiến trúc gì? Tại sao chọn Microservices?</div>
+    <div class="qa-a">Dự án dùng kiến trúc <strong>Polyglot Microservices</strong> — 5 service độc lập, 2 ngôn ngữ (Java + Node.js), 2 database (MariaDB + MongoDB), giao tiếp qua API Gateway và RabbitMQ. Chọn vì bài toán có 2 domain tự nhiên tách biệt: nghiệp vụ phòng trọ (Spring Boot phù hợp do JPA/Hibernate) và realtime chat (Node.js phù hợp do event-driven Socket.IO), dùng chung thì sẽ conflict về tech stack.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Microservices của anh giao tiếp với nhau bằng cách nào?</div>
+    <div class="qa-a">Hai cách: <strong>(1) Synchronous</strong> — Client gọi qua Nginx API Gateway, gateway route đến đúng service theo path prefix. <strong>(2) Asynchronous</strong> — Spring Boot publish message vào RabbitMQ Topic Exchange (<code>saf.booking</code>), Node.js subscribe và consume để đẩy thông báo realtime Socket.IO đến client. Async messaging giúp 2 service hoàn toàn loose coupling — Spring Boot không cần biết Node.js đang chạy ở đâu.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Circuit Breaker là gì? Anh dùng ở đâu?</div>
+    <div class="qa-a">Circuit Breaker là pattern bảo vệ hệ thống khi một service phụ thuộc bị lỗi — giống như cầu dao điện. Tôi dùng Resilience4j <code>@CircuitBreaker</code> trên <code>NotificationService.notify()</code>: khi RabbitMQ bị lỗi ≥50% trong 10 request, circuit mở ra và chạy <code>notifyFallback()</code> thay vì crash. Kết quả: booking vẫn thành công, chỉ mất thông báo tạm thời — user experience không bị ảnh hưởng.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Distributed Tracing là gì? Anh show được không?</div>
+    <div class="qa-a">Distributed Tracing theo dõi một request đi qua nhiều service, đo thời gian từng bước. Tôi dùng Micrometer Tracing + Zipkin. Mở <strong>localhost:9411</strong> → Run Query → thấy danh sách trace → click vào 1 trace → thấy waterfall chart từng bước trong Spring Boot (HTTP filter → controller → service → database). Không cần viết 1 dòng code nào — auto-instrumentation.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Tại sao dùng 2 database khác nhau?</div>
+    <div class="qa-a">MariaDB (quan hệ) phù hợp cho dữ liệu có schema cố định, cần transaction ACID: users, rooms, bookings, payments — cần JOIN, foreign key. MongoDB (document) phù hợp cho chat: mỗi conversation có cấu trúc khác nhau, cần ghi nhanh, scale horizontal tốt hơn. Đây là <strong>Polyglot Persistence</strong> — chọn database phù hợp với từng domain thay vì ép dùng 1 loại.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">API Gateway có tác dụng gì?</div>
+    <div class="qa-a">API Gateway (Nginx) là single entry point duy nhất — client chỉ cần biết 1 địa chỉ (localhost:80), không cần biết bên trong có bao nhiêu service. Gateway làm 3 việc: <strong>(1) Routing</strong> — phân phát request đến đúng service theo path. <strong>(2) WebSocket proxy</strong> — forward Socket.IO handshake và connection. <strong>(3) Serve static files</strong> — trả HTML/CSS/JS của React app trực tiếp, không cần qua backend.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Nếu 1 service bị down thì sao?</div>
+    <div class="qa-a">Tùy service: Nếu <strong>ai-chat-service</strong> down → chỉ mất tính năng AI chatbot, còn lại hoạt động bình thường. Nếu <strong>nodejs-messaging</strong> down → mất realtime chat và notification, nhưng booking/auth vẫn chạy. Nếu <strong>RabbitMQ</strong> down → Circuit Breaker kích hoạt, notification bị bỏ qua nhưng booking vẫn thành công. Đây là lợi thế của Microservices so với Monolithic — một phần fail không kéo sập cả hệ thống.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Sự khác biệt so với Monolithic là gì?</div>
+    <div class="qa-a">
+      <strong>Monolithic:</strong> 1 codebase, 1 database, 1 process — đơn giản hơn nhưng scale khó, deploy phải stop toàn bộ, 1 lỗi có thể crash toàn app.<br/><br/>
+      <strong>SAF Microservices:</strong> 5 service độc lập, có thể scale riêng từng service (Node.js scale theo chat load, Spring Boot scale theo booking load), deploy từng service không ảnh hưởng service khác, mỗi team có thể dùng tech stack riêng.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Làm sao biết tất cả service đang chạy ổn?</div>
+    <div class="qa-a">Hai cách: <strong>(1)</strong> <code>docker-compose ps</code> — xem tất cả container, status phải là <code>(healthy)</code>. <strong>(2)</strong> Spring Boot Actuator — <code>localhost:8082/actuator/health</code> trả JSON chi tiết tình trạng database, RabbitMQ, disk. Docker dùng endpoint này để tự động health check và restart container nếu unhealthy.</div>
+  </div>
+
+  <hr/>
+  <div class="alert info">
+    <strong>Tip bảo vệ:</strong> Khi giáo viên hỏi về bất kỳ tính năng nào, hãy mở ngay công cụ tương ứng để demo trực quan:<br/>
+    • RabbitMQ → localhost:15672 → tab Queues → thực hiện 1 booking → thấy message count tăng<br/>
+    • Zipkin → localhost:9411 → Run Query → click vào trace mới nhất<br/>
+    • Circuit Breaker → localhost:8082/actuator/circuitbreakers → xem trạng thái
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
