@@ -114,7 +114,7 @@ export default function AiChatWidget() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const historyLoaded = useRef(false);
+  const loadedForUserRef = useRef<string | null>(null);
   const aiRawRef = useRef(''); // accumulates raw tokens including [SEARCH:...] tag
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -129,10 +129,12 @@ export default function AiChatWidget() {
     return guestId;
   }, [user]);
 
-  // Load history on first open
+  // Load history khi mở lần đầu hoặc khi userId thay đổi (đổi tài khoản)
   useEffect(() => {
-    if (!isOpen || historyLoaded.current) return;
-    historyLoaded.current = true;
+    if (!isOpen) return;
+    if (loadedForUserRef.current === userId) return;
+    loadedForUserRef.current = userId;
+    setMessages([]);
     setIsLoadingHistory(true);
     fetch(`/api/ai-chat/messages/${userId}`)
       .then(r => r.json())

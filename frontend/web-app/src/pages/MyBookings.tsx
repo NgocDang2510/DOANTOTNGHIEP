@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, MapPin, X, ExternalLink, BookMarked, CreditCard, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CalendarDays, MapPin, X, ExternalLink, BookMarked, AlertCircle } from 'lucide-react';
 import { bookingService, type BookingResponse } from '../services/bookingService';
-import { useAuthStore } from '../stores/authStore';
 import { useNotificationStore } from '../stores/notificationStore';
-import api from '../services/axios';
 
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
   PENDING: { label: 'Chờ xác nhận', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
@@ -15,7 +13,6 @@ const STATUS_MAP: Record<string, { label: string; cls: string }> = {
 
 const MyBookings = () => {
   const navigate = useNavigate();
-  const { token } = useAuthStore();
   const { notifications } = useNotificationStore();
   const [bookings, setBookings] = useState<BookingResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +20,6 @@ const MyBookings = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [cancelConfirmId, setCancelConfirmId] = useState<number | null>(null);
   const [cancellingId, setCancellingId] = useState<number | null>(null);
-  const [payingId, setPayingId] = useState<number | null>(null);
-  const [depositStatus, setDepositStatus] = useState<Record<number, string>>({});
   const [cardErrors, setCardErrors] = useState<Record<number, string>>({});
 
   const setCardError = (id: number, msg: string) => {
@@ -38,21 +33,9 @@ const MyBookings = () => {
       const res = await bookingService.getMyBookings(p);
       setBookings(res.content);
       setTotalPages(res.totalPages);
-      res.content.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').forEach(b => loadDepositStatus(b.id));
     } finally {
       setLoading(false);
     }
-  };
-
-  const loadDepositStatus = async (bookingId: number) => {
-    try {
-      const res = await api.get(`/payments/booking/${bookingId}/status`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.data.data) {
-        setDepositStatus(prev => ({ ...prev, [bookingId]: res.data.data.status }));
-      }
-    } catch { /* no payment yet */ }
   };
 
   useEffect(() => { load(page); }, [page]);
@@ -74,21 +57,6 @@ const MyBookings = () => {
       setCardError(id, err?.response?.data?.message || 'Có lỗi xảy ra');
     } finally {
       setCancellingId(null);
-    }
-  };
-
-  const handleDeposit = async (bookingId: number) => {
-    setPayingId(bookingId);
-    try {
-      const res = await api.post(`/payments/booking/${bookingId}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const payUrl = res.data.data?.payUrl;
-      if (payUrl) window.location.href = payUrl;
-    } catch (err: any) {
-      setCardError(bookingId, err?.response?.data?.message || 'Không thể tạo thanh toán');
-    } finally {
-      setPayingId(null);
     }
   };
 
@@ -129,11 +97,6 @@ const MyBookings = () => {
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_MAP[b.status]?.cls}`}>
                         {STATUS_MAP[b.status]?.label}
                       </span>
-                      {depositStatus[b.id] === 'SUCCESS' && (
-                        <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                          <CheckCircle2 className="w-3 h-3" /> Đã đặt cọc
-                        </span>
-                      )}
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-1">
                       <MapPin className="w-3 h-3 flex-shrink-0" />
@@ -150,21 +113,6 @@ const MyBookings = () => {
                   </div>
 
                   <div className="flex flex-col gap-2 shrink-0 items-end">
-                    {b.status === 'COMPLETED' && depositStatus[b.id] !== 'SUCCESS' && b.roomStatus !== 'RENTED' && (
-                      <button
-                        onClick={() => handleDeposit(b.id)}
-                        disabled={payingId === b.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium disabled:opacity-60 transition-colors"
-                      >
-                        <CreditCard className="w-3.5 h-3.5" />
-                        {payingId === b.id ? 'Đang xử lý...' : 'Đặt cọc'}
-                      </button>
-                    )}
-                    {b.status === 'COMPLETED' && depositStatus[b.id] !== 'SUCCESS' && b.roomStatus === 'RENTED' && (
-                      <span className="text-[11px] text-gray-400 dark:text-gray-500 italic">Phòng đã có người thuê</span>
-                    )}
-
-                    {/* Cancel — inline confirm */}
                     {(b.status === 'PENDING' || b.status === 'CONFIRMED') && (
                       cancelConfirmId === b.id ? (
                         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl px-3 py-2 text-right">
@@ -191,7 +139,6 @@ const MyBookings = () => {
                 </div>
               </div>
 
-              {/* Inline error per card */}
               {cardErrors[b.id] && (
                 <div className="mx-4 mb-3 flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl">
                   <AlertCircle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />

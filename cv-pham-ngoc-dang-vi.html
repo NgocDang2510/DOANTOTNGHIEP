@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV — Phạm Ngọc Đăng</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 11pt;
+      color: #000;
+      background: #fff;
+      padding: 32px 48px;
+      max-width: 820px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── HEADER ── */
+    .header { text-align: center; margin-bottom: 14px; }
+    .header h1 { font-size: 20pt; font-weight: bold; margin-bottom: 4px; }
+    .header .title { font-size: 11pt; margin-bottom: 8px; }
+    .header .contact {
+      font-size: 10pt;
+      display: flex; justify-content: center; align-items: center; gap: 18px;
+      flex-wrap: wrap;
+    }
+    .header .contact span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 18px; }
+    .section-title {
+      font-size: 11pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1.5px solid #000;
+      padding-bottom: 2px;
+      margin-bottom: 10px;
+    }
+
+    /* ── EDUCATION ── */
+    .edu-row { display: flex; justify-content: space-between; align-items: baseline; }
+    .edu-school { font-weight: bold; }
+    .edu-year { font-size: 10.5pt; }
+    .edu-major { margin-top: 3px; font-size: 10.5pt; }
+
+    /* ── PROJECT ── */
+    .proj-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+    .proj-name { font-weight: bold; font-size: 11pt; }
+    .proj-date { font-size: 10.5pt; white-space: nowrap; padding-left: 12px; }
+    .proj-role { margin-bottom: 6px; font-size: 10.5pt; }
+    .proj-role span { font-weight: bold; }
+    .proj-desc { font-size: 10.5pt; margin-bottom: 6px; }
+    .proj-desc .label { font-weight: bold; }
+    .proj-tech { font-size: 10.5pt; margin-bottom: 6px; }
+    .proj-tech .label { font-weight: bold; }
+    .proj-features-title { font-size: 10.5pt; margin-bottom: 4px; font-weight: bold; }
+    .proj-features { list-style: none; padding-left: 0; }
+    .proj-features li {
+      font-size: 10.5pt;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 4px;
+      line-height: 1.55;
+    }
+    .proj-features li::before { content: '•'; position: absolute; left: 0; }
+    .proj-repo { font-size: 10.5pt; margin-top: 6px; }
+    .proj-repo .label { font-weight: bold; }
+
+    /* ── SKILLS ── */
+    .skills-category { font-weight: bold; font-size: 10.5pt; margin: 8px 0 4px; }
+    .skill-row {
+      display: flex;
+      border-bottom: 0.5px solid #ccc;
+      padding: 5px 0;
+      font-size: 10.5pt;
+      align-items: flex-start;
+    }
+    .skill-row:last-child { border-bottom: none; }
+    .skill-label { font-weight: bold; min-width: 210px; padding-right: 12px; flex-shrink: 0; }
+    .skill-value { flex: 1; }
+
+    @media print {
+      body { padding: 18px 36px; }
+      a { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <h1>Phạm Ngọc Đăng</h1>
+  <div class="title">Thực tập sinh Lập trình Fullstack</div>
+  <div class="contact">
+    <span>📞 0326162022</span>
+    <span>✉ dangpham1010da@gmail.com</span>
+    <span>📍 Hiệp Bình, TP HCM</span>
+  </div>
+</div>
+
+<!-- ══ MỤC TIÊU ══ -->
+<div class="section">
+  <div class="section-title">Mục tiêu nghề nghiệp</div>
+  <p style="font-size:10.5pt">
+    Tìm kiếm môi trường làm việc chuyên nghiệp và hợp tác, nơi tôi có thể không ngừng nâng cao kỹ năng lập trình fullstack và kiến trúc microservices, phát triển bản thân, đồng thời đóng góp tích cực vào sự thành công của nhóm và doanh nghiệp.
+  </p>
+</div>
+
+<!-- ══ HỌC VẤN ══ -->
+<div class="section">
+  <div class="section-title">Học vấn</div>
+  <div class="edu-row">
+    <div class="edu-school">Trường Đại học Công nghiệp TP. Hồ Chí Minh (IUH)</div>
+    <div class="edu-year">2022 &nbsp;–&nbsp; Nay</div>
+  </div>
+  <div class="edu-major">Công nghệ Phần mềm</div>
+</div>
+
+<!-- ══ DỰ ÁN CÁ NHÂN ══ -->
+<div class="section">
+  <div class="section-title">Dự án cá nhân</div>
+
+  <div class="proj-row">
+    <div class="proj-name">SmartAccommodationFinder — Nền tảng tìm kiếm & đặt phòng trọ thông minh (Microservices)</div>
+    <div class="proj-date">05/2026 &nbsp;–&nbsp; Nay</div>
+  </div>
+
+  <div class="proj-role"><span>Vai trò:</span> Lập trình viên Fullstack</div>
+
+  <div class="proj-desc">
+    <span class="label">Mô tả:</span>
+    Nền tảng microservices đa ngôn ngữ kết nối sinh viên với chủ trọ, hỗ trợ tìm kiếm phòng theo bộ lọc đa tiêu chí, đặt lịch xem phòng, thanh toán đặt cọc trực tuyến, chat real-time và thông báo tức thì qua WebSocket trên 7 microservice độc lập.
+  </div>
+
+  <div class="proj-tech">
+    <span class="label">Công nghệ:</span>
+    Java, TypeScript, JavaScript (ES6+), Spring Boot 3.3, Node.js, React 19, React Native, MariaDB, MongoDB, RabbitMQ, Docker Compose, Nginx, JWT, Socket.IO
+  </div>
+
+  <div class="proj-features-title">Tính năng nổi bật:</div>
+  <ul class="proj-features">
+    <li>
+      Thiết kế kiến trúc <strong>Polyglot Microservices</strong> gồm 7 service độc lập (Auth, Room, Booking, Payment, Notification, Messaging, AI Chat) theo mẫu <strong>Database-per-Service</strong> với 5 MariaDB và 1 MongoDB riêng biệt cho từng service.
+    </li>
+    <li>
+      Triển khai mẫu <strong>RabbitMQ Topic Exchange fan-out</strong> với 2 queue độc lập (<code>saf.notification.queue</code>, <code>saf.socket.queue</code>), đảm bảo mỗi consumer nhận đủ 100% message mà không bị mất do cạnh tranh (competing consumers).
+    </li>
+    <li>
+      Xây dựng hệ thống thông báo và chat real-time bằng <strong>Socket.IO</strong> — user join room riêng theo userId (<code>user_{id}</code>) để nhận push đúng đích; kết hợp polling 30 giây làm fallback khi offline.
+    </li>
+    <li>
+      Tích hợp <strong>OpenFeign</strong> cho các lời gọi HTTP giữa services (Booking → Room/Auth, Payment → Booking/Room) kết hợp <strong>Resilience4j Circuit Breaker</strong> tự động trả về fallback khi service phụ thuộc bị lỗi.
+    </li>
+    <li>
+      Xác thực người dùng bằng <strong>JWT không trạng thái</strong> (accessToken 15 phút + refreshToken 7 ngày) kết hợp Axios interceptors tự động làm mới token khi nhận lỗi 401 mà không cần người dùng đăng nhập lại.
+    </li>
+    <li>
+      Đóng gói toàn bộ hệ thống bằng <strong>Docker Compose</strong> điều phối 12 containers; <strong>Nginx</strong> đóng vai trò API Gateway duy nhất tại cổng 80, định tuyến traffic nội bộ và phục vụ React SPA dưới dạng file tĩnh.
+    </li>
+  </ul>
+
+  <div class="proj-repo">
+    <span class="label">Repository:</span>
+    <a href="https://github.com/NgocDang2510/DOANTOTNGHIEP">https://github.com/NgocDang2510/DOANTOTNGHIEP</a>
+  </div>
+</div>
+
+<!-- ══ KỸ NĂNG ══ -->
+<div class="section">
+  <div class="section-title">Kỹ năng</div>
+
+  <div class="skills-category">Kỹ năng chuyên môn</div>
+
+  <div class="skill-row">
+    <div class="skill-label">Ngôn ngữ lập trình:</div>
+    <div class="skill-value">Java, TypeScript, JavaScript (ES6+)</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Framework & Thư viện:</div>
+    <div class="skill-value">Spring Boot, React, Node.js, Express.js, React Native, Tailwind CSS, Socket.IO</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Kiến trúc & Hệ thống:</div>
+    <div class="skill-value">Microservices, RESTful API, Event-Driven (RabbitMQ), WebSocket, JWT, Docker</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Cơ sở dữ liệu:</div>
+    <div class="skill-value">MariaDB, MongoDB</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Công cụ:</div>
+    <div class="skill-value">Git, GitHub, Docker Compose, Postman, VS Code, IntelliJ IDEA</div>
+  </div>
+
+  <div class="skills-category" style="margin-top:12px">Kỹ năng mềm</div>
+
+  <div class="skill-row">
+    <div class="skill-label">Tự học & Thích nghi nhanh:</div>
+    <div class="skill-value">Chủ động nghiên cứu và áp dụng công nghệ mới trực tiếp vào dự án thực tế.</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Giải quyết vấn đề:</div>
+    <div class="skill-value">Có khả năng phân tích và xử lý các lỗi phức tạp trong hệ thống phân tán một cách có hệ thống.</div>
+  </div>
+</div>
+
+</body>
+</html>

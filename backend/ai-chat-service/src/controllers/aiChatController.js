@@ -83,25 +83,19 @@ async function searchRooms(params) {
 export const getMessages = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { limit = 50, page = 1 } = req.query;
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const { limit = 50 } = req.query;
 
+    // Lấy 50 message MỚI NHẤT rồi đảo ngược để hiển thị theo thứ tự cũ → mới
     const messages = await AiMessage.find({ userId })
-      .sort({ createdAt: 1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .lean();
 
-    const total = await AiMessage.countDocuments({ userId });
+    messages.reverse();
 
     return res.status(200).json({
       success: true,
       data: messages,
-      pagination: {
-        total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(total / parseInt(limit)),
-      },
     });
   } catch (error) {
     console.error('[AI-Chat] getMessages error:', error.message);

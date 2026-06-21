@@ -21,4 +21,7 @@ public class UserResponse {
     private String role;
     private Boolean isLocked;
     private LocalDateTime createdAt;
+    private String bankName;
+    private String bankAccountNumber;
+    private String bankAccountHolder;
 }

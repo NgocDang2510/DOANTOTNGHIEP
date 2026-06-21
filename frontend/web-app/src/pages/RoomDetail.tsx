@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, Phone, Star, Home, Wifi, Wind, WashingMachine, Car, Bath, ChefHat, Refrigerator, Camera, Building, Heart, ChevronLeft, ChevronRight, CalendarDays, User, Share2, X, Copy, Check } from 'lucide-react';
+import { MapPin, Phone, Star, Home, Wifi, Wind, WashingMachine, Car, Bath, ChefHat, Refrigerator, Camera, Building, Heart, ChevronLeft, ChevronRight, CalendarDays, User, Share2, X, Copy, Check, Landmark, CreditCard } from 'lucide-react';
 import { roomService, type RoomResponse } from '../services/roomService';
 import { bookingService } from '../services/bookingService';
 import { reviewService, type ReviewResponse } from '../services/reviewService';
@@ -67,6 +67,10 @@ const RoomDetail = () => {
   const [showQR, setShowQR] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+
+  // Landlord bank info
+  const [landlordBank, setLandlordBank] = useState<{ bankName?: string; bankAccountNumber?: string; bankAccountHolder?: string } | null>(null);
 
   const roomUrl = `${window.location.origin}/rooms/${id}`;
 
@@ -93,6 +97,14 @@ const RoomDetail = () => {
     });
   };
 
+  const handleCopyAccount = () => {
+    if (!landlordBank?.bankAccountNumber) return;
+    navigator.clipboard.writeText(landlordBank.bankAccountNumber).then(() => {
+      setCopiedAccount(true);
+      setTimeout(() => setCopiedAccount(false), 2000);
+    });
+  };
+
   useEffect(() => {
     if (!id) return;
     const load = async () => {
@@ -103,6 +115,15 @@ const RoomDetail = () => {
         ]);
         setRoom(r);
         setReviews(rev.content);
+        // Fetch landlord bank info separately
+        import('../services/axios').then(({ default: api }) => {
+          api.get(`/users/${r.landlordId}`).then(res => {
+            const u = res.data.data;
+            if (u?.bankName && u?.bankAccountNumber) {
+              setLandlordBank({ bankName: u.bankName, bankAccountNumber: u.bankAccountNumber, bankAccountHolder: u.bankAccountHolder });
+            }
+          }).catch(() => {});
+        });
         addToHistory({
           id: r.id,
           title: r.title,
@@ -456,6 +477,56 @@ const RoomDetail = () => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Bank info — shown to non-owner students when landlord has set it */}
+          {!isOwner && isStudent && landlordBank && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center gap-2 mb-3">
+                <Landmark className="w-4 h-4 text-blue-500" />
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Thông tin chuyển khoản</h3>
+              </div>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
+                Dùng để chuyển tiền đặt cọc sau khi đã thỏa thuận trực tiếp với chủ nhà.
+              </p>
+
+              {/* QR Code */}
+              <div className="flex justify-center mb-3">
+                <img
+                  src={`https://img.vietqr.io/image/${landlordBank.bankName}-${landlordBank.bankAccountNumber}-compact2.jpg?accountName=${encodeURIComponent(landlordBank.bankAccountHolder || '')}`}
+                  alt="QR chuyển khoản"
+                  className="w-36 h-36 rounded-xl"
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+
+              {/* Bank details */}
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700">
+                  <span className="text-gray-400 text-xs">Ngân hàng</span>
+                  <span className="font-semibold text-gray-800 dark:text-white text-xs">{landlordBank.bankName}</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700">
+                  <span className="text-gray-400 text-xs">Số tài khoản</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-gray-900 dark:text-white text-sm tracking-wider">{landlordBank.bankAccountNumber}</span>
+                    <button onClick={handleCopyAccount} className="text-blue-500 hover:text-blue-700 transition-colors">
+                      {copiedAccount ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+                {landlordBank.bankAccountHolder && (
+                  <div className="flex justify-between items-center py-1.5">
+                    <span className="text-gray-400 text-xs">Chủ tài khoản</span>
+                    <span className="font-semibold text-gray-800 dark:text-white text-xs uppercase">{landlordBank.bankAccountHolder}</span>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-2.5 py-1.5 mt-3">
+                Chỉ chuyển khoản sau khi đã xem phòng và thỏa thuận xong với chủ nhà.
+              </p>
             </div>
           )}
 

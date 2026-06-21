@@ -13,4 +13,7 @@ public class UpdateUserProfileRequest {
     private String gender;
     private LocalDate birthday;
     private String email;
+    private String bankName;
+    private String bankAccountNumber;
+    private String bankAccountHolder;
 }

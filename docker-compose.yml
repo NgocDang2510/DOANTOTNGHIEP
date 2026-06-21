@@ -351,7 +351,7 @@ services:
       NODE_ENV: production
       JWT_SECRET: ${JWT_SECRET:-saf-secret-key-very-long-string-for-jwt-signing-operations-please-change-in-production}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      SPRING_BOOT_URL: http://auth-service:8081
+      SPRING_BOOT_URL: http://room-service:8082
       CORS_ORIGIN: http://localhost,http://localhost:80
     extra_hosts:
       - "host.docker.internal:host-gateway"

@@ -38,6 +38,15 @@ public class User {
 
     private LocalDate birthday;
 
+    @Column(length = 50)
+    private String bankName;
+
+    @Column(length = 30)
+    private String bankAccountNumber;
+
+    @Column(length = 100)
+    private String bankAccountHolder;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

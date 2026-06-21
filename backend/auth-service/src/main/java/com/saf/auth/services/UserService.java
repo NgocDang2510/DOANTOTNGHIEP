@@ -63,6 +63,9 @@ public class UserService {
         if (request.getGender() != null) user.setGender(request.getGender());
         if (request.getBirthday() != null) user.setBirthday(request.getBirthday());
         if (request.getEmail() != null) user.setEmail(request.getEmail().trim().isEmpty() ? null : request.getEmail().trim());
+        if (request.getBankName() != null) user.setBankName(request.getBankName().trim().isEmpty() ? null : request.getBankName().trim());
+        if (request.getBankAccountNumber() != null) user.setBankAccountNumber(request.getBankAccountNumber().trim().isEmpty() ? null : request.getBankAccountNumber().trim());
+        if (request.getBankAccountHolder() != null) user.setBankAccountHolder(request.getBankAccountHolder().trim().isEmpty() ? null : request.getBankAccountHolder().trim());
         return toUserResponse(userRepository.save(user));
     }
 
@@ -152,6 +155,8 @@ public class UserService {
                 .fullName(user.getFullName()).avatarUrl(user.getAvatarUrl()).coverUrl(user.getCoverUrl())
                 .gender(user.getGender()).birthday(user.getBirthday())
                 .role(user.getRole().toString()).isLocked(user.getIsLocked()).createdAt(user.getCreatedAt())
+                .bankName(user.getBankName()).bankAccountNumber(user.getBankAccountNumber())
+                .bankAccountHolder(user.getBankAccountHolder())
                 .build();
     }
 }

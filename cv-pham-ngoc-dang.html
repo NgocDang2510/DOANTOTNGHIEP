@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV — Phạm Ngọc Đăng</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 11pt;
+      color: #000;
+      background: #fff;
+      padding: 32px 48px;
+      max-width: 820px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── HEADER ── */
+    .header { text-align: center; margin-bottom: 14px; }
+    .header h1 { font-size: 20pt; font-weight: bold; margin-bottom: 4px; }
+    .header .title { font-size: 11pt; margin-bottom: 8px; }
+    .header .contact {
+      font-size: 10pt;
+      display: flex; justify-content: center; align-items: center; gap: 18px;
+      flex-wrap: wrap;
+    }
+    .header .contact span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 18px; }
+    .section-title {
+      font-size: 11pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1.5px solid #000;
+      padding-bottom: 2px;
+      margin-bottom: 10px;
+    }
+
+    /* ── EDUCATION ── */
+    .edu-row { display: flex; justify-content: space-between; align-items: baseline; }
+    .edu-school { font-weight: bold; }
+    .edu-year { font-size: 10.5pt; }
+    .edu-major { margin-top: 3px; font-size: 10.5pt; }
+
+    /* ── PROJECT ── */
+    .proj-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+    .proj-name { font-weight: bold; font-size: 11pt; }
+    .proj-date { font-size: 10.5pt; }
+    .proj-role { margin-bottom: 6px; font-size: 10.5pt; }
+    .proj-role span { font-weight: bold; }
+    .proj-desc { font-size: 10.5pt; margin-bottom: 6px; }
+    .proj-desc .label { font-weight: bold; }
+    .proj-tech { font-size: 10.5pt; margin-bottom: 6px; }
+    .proj-tech .label { font-weight: bold; }
+    .proj-features-title { font-size: 10.5pt; margin-bottom: 4px; }
+    .proj-features { list-style: none; padding-left: 0; }
+    .proj-features li {
+      font-size: 10.5pt;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 4px;
+      line-height: 1.55;
+    }
+    .proj-features li::before { content: '•'; position: absolute; left: 0; }
+    .proj-repo { font-size: 10.5pt; margin-top: 6px; }
+    .proj-repo .label { font-weight: bold; }
+
+    /* ── SKILLS ── */
+    .skills-category { font-weight: bold; font-size: 10.5pt; margin: 8px 0 4px; }
+    .skill-row {
+      display: flex;
+      border-bottom: 0.5px solid #ccc;
+      padding: 5px 0;
+      font-size: 10.5pt;
+      align-items: flex-start;
+    }
+    .skill-row:last-child { border-bottom: none; }
+    .skill-label { font-weight: bold; min-width: 210px; padding-right: 12px; flex-shrink: 0; }
+    .skill-value { flex: 1; }
+
+    @media print {
+      body { padding: 18px 36px; }
+      a { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <h1>Phạm Ngọc Đăng</h1>
+  <div class="title">Developer Intern</div>
+  <div class="contact">
+    <span>📞 0326162022</span>
+    <span>✉ dangpham1010da@gmail.com</span>
+    <span>📍 Hiệp Bình, TP HCM</span>
+  </div>
+</div>
+
+<!-- ══ OBJECTIVE ══ -->
+<div class="section">
+  <div class="section-title">Objective</div>
+  <p style="font-size:10.5pt">
+    Seeking a collaborative and professional development environment where I can continuously refine my technical skills in full-stack development and microservices architecture, grow personally and professionally, and actively contribute to the collective success of the team and the business.
+  </p>
+</div>
+
+<!-- ══ EDUCATION ══ -->
+<div class="section">
+  <div class="section-title">Education</div>
+  <div class="edu-row">
+    <div class="edu-school">Industrial University of Ho Chi Minh City (IUH)</div>
+    <div class="edu-year">2022 &nbsp;–&nbsp; Present</div>
+  </div>
+  <div class="edu-major">Software Engineering</div>
+</div>
+
+<!-- ══ PERSONAL PROJECT ══ -->
+<div class="section">
+  <div class="section-title">Personal Project</div>
+
+  <div class="proj-row">
+    <div class="proj-name">SmartAccommodationFinder — Student Room Rental Platform (Microservices)</div>
+    <div class="proj-date">05/2026 &nbsp;–&nbsp; Present</div>
+  </div>
+
+  <div class="proj-role"><span>Role:</span> Full-stack Developer</div>
+
+  <div class="proj-desc">
+    <span class="label">Description:</span>
+    A polyglot microservices platform connecting students with landlords for room searching, scheduling viewings, and online deposit payment. Features include real-time notifications via WebSocket, in-app chat, and interactive map integration across 7 independent microservices.
+  </div>
+
+  <div class="proj-tech">
+    <span class="label">Tech Stack:</span>
+    Java, TypeScript, JavaScript (ES6+), Spring Boot 3.3, Node.js, React 19, React Native, MariaDB, MongoDB, RabbitMQ, Docker Compose, Nginx, JWT, Socket.IO
+  </div>
+
+  <div class="proj-features-title">Key Features:</div>
+  <ul class="proj-features">
+    <li>
+      Designed a <strong>Polyglot Microservices</strong> architecture with 7 independent services (Auth, Room, Booking, Payment, Notification, Messaging) following the <strong>Database-per-Service</strong> pattern with 5 MariaDB instances and 1 MongoDB for chat messages.
+    </li>
+    <li>
+      Implemented <strong>RabbitMQ Topic Exchange</strong> fan-out pattern with separate queues (<code>saf.notification.queue</code>, <code>saf.socket.queue</code>) ensuring independent full delivery to all consumers, eliminating competing consumer message loss.
+    </li>
+    <li>
+      Built real-time notification and chat system using <strong>Socket.IO</strong> with users joining dedicated rooms (<code>user_{id}</code>) for targeted push delivery; combined with 30-second polling fallback for offline catch-up.
+    </li>
+    <li>
+      Integrated <strong>OpenFeign</strong> for declarative inter-service HTTP calls (Booking → Room/Auth, Payment → Booking/Room) with <strong>Resilience4j Circuit Breaker</strong> automatically returning fallback responses when dependent services fail.
+    </li>
+    <li>
+      Implemented <strong>JWT stateless authentication</strong> (accessToken 15 min + refreshToken 7 days) with Axios interceptors auto-refreshing expired tokens on 401 responses without user interruption.
+    </li>
+    <li>
+      Containerized the entire system with <strong>Docker Compose</strong> orchestrating 12 containers; <strong>Nginx</strong> serves as the single API Gateway on port 80, routing all traffic internally and serving the React SPA as static files.
+    </li>
+  </ul>
+
+  <div class="proj-repo">
+    <span class="label">Repository:</span>
+    <a href="https://github.com/NgocDang2510/DOANTOTNGHIEP">https://github.com/NgocDang2510/DOANTOTNGHIEP</a>
+  </div>
+</div>
+
+<!-- ══ SKILLS ══ -->
+<div class="section">
+  <div class="section-title">Skills</div>
+
+  <div class="skills-category">Technical Skills</div>
+
+  <div class="skill-row">
+    <div class="skill-label">Programming Languages:</div>
+    <div class="skill-value">Java, TypeScript, JavaScript (ES6+)</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Frameworks & Libraries:</div>
+    <div class="skill-value">Spring Boot, React, Node.js, Express.js, React Native, Tailwind CSS, Socket.IO</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Architecture & System Tech:</div>
+    <div class="skill-value">Microservices, RESTful API, Event-Driven Architecture (RabbitMQ), WebSocket, JWT, Docker</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Databases:</div>
+    <div class="skill-value">MariaDB, MongoDB</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Tools:</div>
+    <div class="skill-value">Git, GitHub, Docker Compose, Postman, VS Code, IntelliJ IDEA</div>
+  </div>
+
+  <div class="skills-category" style="margin-top:12px">Soft Skills</div>
+
+  <div class="skill-row">
+    <div class="skill-label">Self-study & Quick Adaptation:</div>
+    <div class="skill-value">Proactively research and implement new technologies into real projects.</div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Problem Solving:</div>
+    <div class="skill-value">Strong ability to analyze and resolve complex distributed system issues systematically.</div>
+  </div>
+</div>
+
+</body>
+</html>
